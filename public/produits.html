@@ -8,12 +8,12 @@
     <!-- Font Awesome 6 (Free) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
-    <!-- Google Fonts : Playfair Display + Quicksand -->
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
     <style>
         /* ============================================================
-                   THE LITTLE SPOON — Admin Design System (same as dashboard)
+                   THE LITTLE SPOON — Product Management (no horizontal scroll)
                    ============================================================ */
 
         * {
@@ -59,6 +59,10 @@
             background: var(--bg-warm);
             color: var(--text-main);
             min-height: 100vh;
+            overflow-x: hidden;
+            background-image:
+                radial-gradient(ellipse at 20% 50%, rgba(201, 169, 126, 0.06) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(120, 84, 96, 0.04) 0%, transparent 50%);
         }
 
         a {
@@ -100,10 +104,11 @@
         .app-shell {
             display: flex;
             min-height: 100vh;
+            overflow: hidden;
         }
 
         /* ============================================================
-                   SIDEBAR (same as dashboard)
+                   SIDEBAR
                    ============================================================ */
         .sidebar {
             width: 270px;
@@ -118,8 +123,9 @@
             left: 0;
             bottom: 0;
             z-index: 100;
-            transition: transform var(--transition);
+            transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             box-shadow: var(--shadow-sm);
+            overflow-y: auto;
         }
 
         .sidebar-brand {
@@ -129,20 +135,17 @@
             margin-bottom: 40px;
             padding-bottom: 24px;
             border-bottom: 1px solid var(--border-light);
+            flex-shrink: 0;
         }
 
         .sidebar-brand .brand-logo {
             width: 48px;
             height: 48px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary-light), var(--accent-rose));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary);
-            font-size: 22px;
+            object-fit: cover;
             flex-shrink: 0;
             box-shadow: 0 4px 16px rgba(120, 84, 96, 0.15);
+            border: 2px solid var(--accent-rose);
         }
 
         .sidebar-brand h1 {
@@ -192,22 +195,15 @@
             font-size: 18px;
             text-align: center;
             flex-shrink: 0;
-            transition: transform var(--transition);
         }
         .nav-link:hover {
             background: var(--surface-alt);
             color: var(--text-main);
         }
-        .nav-link:hover i {
-            transform: translateX(2px);
-        }
         .nav-link.active {
             background: var(--primary-container);
             color: var(--primary);
             font-weight: 600;
-        }
-        .nav-link.active i {
-            color: var(--primary);
         }
         .nav-link.active::before {
             content: '';
@@ -226,6 +222,7 @@
             display: flex;
             flex-direction: column;
             gap: 4px;
+            flex-shrink: 0;
         }
         .sidebar-footer .nav-link {
             font-size: 13px;
@@ -270,7 +267,7 @@
             z-index: 90;
             backdrop-filter: blur(3px);
             opacity: 0;
-            transition: opacity var(--transition);
+            transition: opacity 0.35s ease;
         }
         .sidebar-overlay.show {
             opacity: 1;
@@ -283,9 +280,10 @@
             flex: 1;
             margin-left: 270px;
             padding: 32px 44px 60px;
-            max-width: 1280px;
+            max-width: calc(100% - 270px);
             width: 100%;
-            transition: margin var(--transition);
+            transition: margin 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            overflow-x: hidden;
         }
 
         /* ---------- Page header ---------- */
@@ -307,15 +305,16 @@
             margin-top: 4px;
         }
 
-        /* ---------- Form card (Create Masterpiece) ---------- */
+        /* ---------- Form card ---------- */
         .form-card {
             background: var(--surface);
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--border-light);
-            padding: 36px 40px;
+            padding: 32px 36px;
             margin-bottom: 40px;
             transition: box-shadow var(--transition);
+            overflow: hidden;
         }
         .form-card:hover {
             box-shadow: var(--shadow-md);
@@ -330,18 +329,13 @@
         .form-card .form-subtitle {
             color: var(--text-muted);
             font-size: 14px;
-            margin-bottom: 28px;
+            margin-bottom: 24px;
         }
 
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 30px;
-        }
-        @media (max-width: 768px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
+            gap: 28px 32px;
         }
 
         /* Image preview box (4:5) */
@@ -355,6 +349,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: border-color var(--transition);
+            cursor: pointer;
+        }
+        .preview-box:hover {
+            border-color: var(--secondary);
         }
         .preview-box img {
             width: 100%;
@@ -409,13 +408,13 @@
             aspect-ratio: 1;
             border-radius: var(--radius-sm);
             overflow: hidden;
-            border: 1px solid var(--border-light);
+            border: 2px solid var(--border-light);
             cursor: pointer;
             transition: all var(--transition);
         }
         .preset-btn:hover {
             border-color: var(--primary);
-            transform: scale(1.02);
+            transform: scale(1.04);
         }
         .preset-btn img {
             width: 100%;
@@ -443,7 +442,6 @@
         .btn-publish:hover {
             background: var(--primary-dark);
             transform: scale(1.02);
-            box-shadow: 0 8px 28px rgba(244, 198, 212, 0.6);
         }
         .btn-publish:disabled {
             opacity: 0.5;
@@ -473,12 +471,35 @@
             margin-top: 20px;
         }
 
+        .btn-upload {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--surface-alt);
+            color: var(--text-muted);
+            padding: 8px 16px;
+            border-radius: var(--radius-full);
+            font-weight: 600;
+            font-size: 13px;
+            border: 1px solid var(--border-light);
+            transition: all var(--transition);
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        .btn-upload:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+            border-color: var(--primary-container);
+        }
+
         /* ---------- Product list ---------- */
         .list-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 8px;
         }
         .list-header h3 {
             font-family: 'Playfair Display', serif;
@@ -498,13 +519,17 @@
             background: var(--surface);
             border-radius: var(--radius-md);
             border: 1px solid var(--border-light);
-            overflow: hidden;
+            overflow-x: auto;
+            overflow-y: visible;
             box-shadow: var(--shadow-sm);
+            -webkit-overflow-scrolling: touch;
         }
+
         .product-table {
             width: 100%;
             border-collapse: collapse;
             font-size: 14px;
+            min-width: 600px;
         }
         .product-table th {
             background: var(--surface-alt);
@@ -515,6 +540,7 @@
             font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 0.06em;
+            white-space: nowrap;
         }
         .product-table td {
             padding: 14px 18px;
@@ -527,6 +553,7 @@
             border-radius: var(--radius-sm);
             object-fit: cover;
             background: var(--primary-container);
+            display: block;
         }
         .product-table .product-name-cell {
             font-weight: 600;
@@ -539,16 +566,19 @@
             padding: 2px 12px;
             border-radius: var(--radius-full);
             display: inline-block;
+            white-space: nowrap;
         }
         .product-table .product-price {
             font-weight: 600;
             color: var(--secondary);
+            white-space: nowrap;
         }
         .product-table .product-status {
             display: inline-block;
             width: 10px;
             height: 10px;
             border-radius: 50%;
+            flex-shrink: 0;
         }
         .product-table .product-status.available {
             background: #27ae60;
@@ -620,6 +650,7 @@
             font-weight: 500;
             font-size: 14px;
             pointer-events: none;
+            max-width: 90vw;
         }
         .toast.show {
             transform: translate(-50%, 0);
@@ -644,6 +675,9 @@
             .main-content {
                 padding: 24px 28px 48px;
             }
+            .form-grid {
+                gap: 20px 24px;
+            }
         }
 
         @media (max-width: 820px) {
@@ -665,46 +699,54 @@
                 margin-left: 0;
                 padding: 24px 20px 40px;
                 padding-top: 76px;
+                max-width: 100%;
+            }
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
             }
             .form-card {
-                padding: 24px 20px;
+                padding: 20px 18px;
             }
             .form-card .form-title {
                 font-size: 22px;
             }
             .product-table-wrap {
-                overflow-x: auto;
+                border-radius: var(--radius-sm);
             }
             .product-table {
                 font-size: 13px;
-                min-width: 600px;
+                min-width: 500px;
             }
             .product-table th,
             .product-table td {
-                padding: 10px 14px;
+                padding: 10px 12px;
             }
-        }
-
-        @media (max-width: 480px) {
-            .main-content {
-                padding: 16px 14px 32px;
-                padding-top: 72px;
-            }
-            .form-card {
-                padding: 18px 14px;
-            }
-            .btn-publish {
-                width: 100%;
-                justify-content: center;
-            }
-            .page-header h2 {
-                font-size: 28px;
+            .presets-row {
+                grid-template-columns: repeat(4, 1fr);
             }
             .toast {
                 bottom: 16px;
                 padding: 14px 20px;
                 font-size: 13px;
                 width: calc(100% - 32px);
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 14px 12px 32px;
+                padding-top: 72px;
+            }
+            .form-card {
+                padding: 16px 12px;
+            }
+            .page-header h2 {
+                font-size: 26px;
+            }
+            .btn-publish {
+                width: 100%;
                 justify-content: center;
             }
             .form-actions {
@@ -715,23 +757,32 @@
                 width: 100%;
                 justify-content: center;
             }
+            .product-table {
+                font-size: 12px;
+                min-width: 420px;
+            }
+            .product-table th,
+            .product-table td {
+                padding: 8px 10px;
+            }
+            .presets-row {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 6px;
+            }
+            .sidebar-brand .brand-logo {
+                width: 40px;
+                height: 40px;
+            }
+            .sidebar-brand h1 {
+                font-size: 17px;
+            }
+            .sidebar {
+                padding: 20px 14px;
+                width: 260px;
+            }
         }
 
         /* ---------- Utilities ---------- */
-        .text-center {
-            text-align: center;
-        }
-        .mt-16 {
-            margin-top: 16px;
-        }
-        .flex-center {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .gap-8 {
-            gap: 8px;
-        }
         .loading-state {
             text-align: center;
             padding: 32px;
@@ -766,9 +817,7 @@
     ============================================================ -->
     <nav class="sidebar" id="sidebar" role="navigation" aria-label="Navigation principale">
         <div class="sidebar-brand">
-            <div class="brand-logo" aria-hidden="true">
-                <i class="fa-solid fa-utensils"></i>
-            </div>
+            <img src="logo.jpg" alt="The Little Spoon" class="brand-logo" />
             <div>
                 <h1>The Little <span>Spoon</span></h1>
                 <div class="sub">Administration</div>
@@ -821,9 +870,9 @@
         </header>
 
         <!-- ============================================================
-        ADD PRODUCT FORM (Create Masterpiece)
+        ADD PRODUCT FORM
         ============================================================ -->
-        <section class="form-card" id="addProductForm">
+        <section class="form-card">
             <div class="form-title">Create Masterpiece</div>
             <div class="form-subtitle">Ajoutez une nouvelle création au catalogue de la boutique.</div>
 
@@ -867,9 +916,8 @@
                             </div>
                         </div>
 
-                        <!-- Hidden file input for drag & drop / click upload -->
                         <input type="file" id="imageFileInput" accept="image/*" style="display:none;" />
-                        <button type="button" class="btn-discard" style="margin-top:8px;" onclick="document.getElementById('imageFileInput').click();">
+                        <button type="button" class="btn-upload" onclick="document.getElementById('imageFileInput').click();">
                             <i class="fa-regular fa-upload"></i> Téléverser une image
                         </button>
                     </div>
@@ -886,7 +934,6 @@
                                 <label>Catégorie Collection</label>
                                 <select id="cakeCategory">
                                     <option value="">Sélectionner une collection</option>
-                                    <!-- Chargé dynamiquement -->
                                 </select>
                             </div>
 
@@ -1074,16 +1121,14 @@
         // IMAGE UPLOAD (drag & drop / click)
         // ============================================================
         const fileInput = document.getElementById('imageFileInput');
+        const previewBox = document.getElementById('previewBox');
 
-        // Click to upload
         fileInput.addEventListener('change', function(e) {
             if (this.files && this.files[0]) {
                 handleImageFile(this.files[0]);
             }
         });
 
-        // Drag & Drop on the preview box
-        const previewBox = document.getElementById('previewBox');
         previewBox.addEventListener('dragover', function(e) {
             e.preventDefault();
             this.style.borderColor = 'var(--primary)';
@@ -1100,7 +1145,6 @@
             }
         });
 
-        // Also allow clicking the preview box to upload
         previewBox.addEventListener('click', function() {
             fileInput.click();
         });
@@ -1116,7 +1160,6 @@
             }
 
             try {
-                // Read as base64
                 const reader = new FileReader();
                 const dataBase64 = await new Promise((resolve, reject) => {
                     reader.onload = () => resolve(reader.result.split(',')[1]);
@@ -1142,7 +1185,6 @@
                     throw new Error(result.error || 'Échec du téléversement');
                 }
 
-                // Set the URL in the input and preview
                 imgUrlInput.value = result.url;
                 updatePreview();
                 showToast('Image téléversée avec succès !', 'success');
@@ -1170,7 +1212,6 @@
                 });
             } catch (err) {
                 console.error('Erreur chargement catégories:', err);
-                // Fallback: keep default options
             }
         }
 
@@ -1226,23 +1267,22 @@
             `;
 
             products.forEach(p => {
-                const statusClass = p.is_available ? 'available' : 'unavailable';
-                const statusLabel = p.is_available ? 'Disponible' : 'Indisponible';
+                const statusClass = p.is_available !== false ? 'available' : 'unavailable';
                 const thumb = p.image_url || '';
 
                 html += `
                     <tr>
                         <td>
-                            ${thumb ? `<img src="${thumb}" alt="${p.name}" class="product-thumb" />` : '<span style="color:var(--text-light);font-size:20px;"><i class="fa-regular fa-image"></i></span>'}
+                            ${thumb ? `<img src="${thumb}" alt="${escapeHtml(p.name)}" class="product-thumb" />` : '<span style="color:var(--text-light);font-size:20px;"><i class="fa-regular fa-image"></i></span>'}
                         </td>
                         <td class="product-name-cell">${escapeHtml(p.name)}</td>
                         <td><span class="product-category">${escapeHtml(p.category_name || 'Non classé')}</span></td>
                         <td class="product-price">${p.price ? p.price + ' DA' : '—'}</td>
-                        <td><span class="product-status ${statusClass}" title="${statusLabel}"></span></td>
+                        <td><span class="product-status ${statusClass}" title="${p.is_available !== false ? 'Disponible' : 'Indisponible'}"></span></td>
                         <td style="text-align:right;">
                             <div class="action-cell">
-                                <button onclick="toggleProductStatus(${p.id}, ${!p.is_available})" title="Basculer disponibilité">
-                                    <i class="fa-solid ${p.is_available ? 'fa-eye' : 'fa-eye-slash'}"></i>
+                                <button onclick="toggleProductStatus(${p.id}, ${p.is_available !== false ? 'false' : 'true'})" title="Basculer disponibilité">
+                                    <i class="fa-solid ${p.is_available !== false ? 'fa-eye' : 'fa-eye-slash'}"></i>
                                 </button>
                                 <button onclick="deleteProduct(${p.id})" class="delete" title="Supprimer">
                                     <i class="fa-regular fa-trash-can"></i>
@@ -1324,7 +1364,6 @@
             const categoryId = document.getElementById('cakeCategory').value;
             const imageUrl = imgUrlInput.value.trim();
 
-            // Validate
             if (!name) {
                 showToast('Veuillez entrer un nom.', 'error');
                 document.getElementById('cakeName').focus();
@@ -1366,13 +1405,11 @@
 
                 showToast('Création publiée avec succès !', 'success');
 
-                // Reset form
                 form.reset();
                 imgUrlInput.value = '';
                 updatePreview();
                 document.getElementById('cakeCategory').value = '';
 
-                // Reload product list
                 loadProducts();
 
             } catch (err) {
