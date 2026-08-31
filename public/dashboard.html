@@ -13,8 +13,8 @@
 
     <style>
         /* ============================================================
-                   THE LITTLE SPOON — Admin Redesign
-                   Fluid, icon-rich, animated, modern pastry vibe
+                   THE LITTLE SPOON — Admin Redesign (v2)
+                   Enhanced animations, logo, icons
                    ============================================================ */
 
         /* ---------- Reset & vars ---------- */
@@ -65,6 +65,18 @@
             background-image:
                 radial-gradient(ellipse at 20% 50%, rgba(212, 163, 115, 0.06) 0%, transparent 60%),
                 radial-gradient(ellipse at 80% 20%, rgba(124, 79, 94, 0.04) 0%, transparent 50%);
+            animation: pageFade 0.8s ease forwards;
+        }
+
+        @keyframes pageFade {
+            from {
+                opacity: 0;
+                transform: scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
 
         a {
@@ -137,18 +149,25 @@
             border-bottom: 1px solid var(--border-light);
         }
 
-        .sidebar-brand .brand-icon {
-            width: 48px;
-            height: 48px;
+        .sidebar-brand .brand-logo {
+            width: 54px;
+            height: 54px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary-light), var(--accent-rose));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary);
-            font-size: 22px;
+            object-fit: cover;
             flex-shrink: 0;
             box-shadow: 0 4px 16px rgba(124, 79, 94, 0.15);
+            animation: float 3s ease-in-out infinite;
+            border: 2px solid var(--accent-rose);
+        }
+
+        @keyframes float {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-6px);
+            }
         }
 
         .sidebar-brand h1 {
@@ -199,14 +218,15 @@
             font-size: 18px;
             text-align: center;
             flex-shrink: 0;
-            transition: transform var(--transition);
+            transition: all var(--transition-bounce);
         }
         .nav-link:hover {
             background: var(--surface-alt);
             color: var(--text-main);
         }
         .nav-link:hover i {
-            transform: translateX(2px);
+            transform: translateX(2px) scale(1.1);
+            color: var(--primary);
         }
         .nav-link.active {
             background: var(--primary-light);
@@ -327,6 +347,17 @@
             font-weight: 400;
             margin-top: 4px;
         }
+        .page-header-left p i {
+            animation: spinSlow 6s linear infinite;
+        }
+        @keyframes spinSlow {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
 
         .stat-group {
             display: flex;
@@ -341,12 +372,29 @@
             min-width: 140px;
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--border-light);
-            transition: all var(--transition);
+            transition: all var(--transition-bounce);
             text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 30%, rgba(212, 163, 115, 0.04), transparent 70%);
+            transition: opacity 0.6s;
+            opacity: 0;
+        }
+        .stat-card:hover::after {
+            opacity: 1;
         }
         .stat-card:hover {
-            transform: translateY(-3px);
+            transform: translateY(-4px) scale(1.02);
             box-shadow: var(--shadow-md);
+            border-color: var(--accent-rose);
         }
 
         .stat-card .stat-label {
@@ -364,6 +412,15 @@
             margin-top: 4px;
             line-height: 1.2;
             transition: all var(--transition);
+            animation: pulseGlow 2s infinite alternate;
+        }
+        @keyframes pulseGlow {
+            0% {
+                text-shadow: 0 0 0 rgba(124, 79, 94, 0);
+            }
+            100% {
+                text-shadow: 0 0 12px rgba(124, 79, 94, 0.15);
+            }
         }
         .stat-card .stat-value .stat-icon {
             font-size: 20px;
@@ -398,20 +455,25 @@
             background: var(--surface);
             border: 1px solid var(--border-light);
             color: var(--text-muted);
-            transition: all var(--transition);
+            transition: all var(--transition-bounce);
             white-space: nowrap;
             display: flex;
             align-items: center;
             gap: 8px;
+            position: relative;
         }
         .filter-pill i {
             font-size: 14px;
             opacity: 0.6;
+            transition: transform var(--transition);
         }
         .filter-pill:hover {
             border-color: var(--secondary);
             color: var(--text-main);
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+        }
+        .filter-pill:hover i {
+            transform: rotate(15deg) scale(1.1);
         }
         .filter-pill.active {
             background: var(--primary);
@@ -422,6 +484,7 @@
         .filter-pill.active i {
             opacity: 1;
             color: #fff;
+            transform: scale(1.1);
         }
         .filter-pill .badge-count {
             background: rgba(255, 255, 255, 0.2);
@@ -434,7 +497,7 @@
             background: rgba(255, 255, 255, 0.25);
         }
 
-        /* ---------- Orders grid ---------- */
+        /* ---------- Orders container ---------- */
         .orders-container {
             display: flex;
             flex-direction: column;
@@ -464,10 +527,39 @@
             flex-wrap: wrap;
             align-items: center;
             gap: 18px 24px;
-            transition: all var(--transition);
+            transition: all var(--transition-bounce);
             position: relative;
             overflow: hidden;
+            animation: cardSlide 0.4s ease forwards;
+            opacity: 0;
         }
+        .order-card:nth-child(1) {
+            animation-delay: 0.05s;
+        }
+        .order-card:nth-child(2) {
+            animation-delay: 0.10s;
+        }
+        .order-card:nth-child(3) {
+            animation-delay: 0.15s;
+        }
+        .order-card:nth-child(4) {
+            animation-delay: 0.20s;
+        }
+        .order-card:nth-child(5) {
+            animation-delay: 0.25s;
+        }
+
+        @keyframes cardSlide {
+            0% {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
         .order-card::before {
             content: '';
             position: absolute;
@@ -497,7 +589,7 @@
         }
 
         .order-card:hover {
-            transform: translateY(-3px);
+            transform: translateY(-4px) scale(1.01);
             box-shadow: var(--shadow-md);
             border-color: var(--accent-rose);
         }
@@ -521,10 +613,11 @@
             font-size: 24px;
             color: var(--primary);
             flex-shrink: 0;
-            transition: transform var(--transition);
+            transition: all var(--transition-bounce);
         }
         .order-card:hover .order-thumb {
-            transform: scale(1.05) rotate(-2deg);
+            transform: scale(1.08) rotate(-4deg);
+            background: var(--accent-rose);
         }
 
         .order-card .order-info {
@@ -565,6 +658,11 @@
         .order-card .order-info .order-meta i {
             font-size: 13px;
             opacity: 0.6;
+            transition: all var(--transition);
+        }
+        .order-card:hover .order-info .order-meta i {
+            opacity: 1;
+            color: var(--primary);
         }
 
         /* Status chip */
@@ -583,6 +681,7 @@
         }
         .status-chip i {
             font-size: 12px;
+            animation: none;
         }
         .status-chip.new {
             background: #fde8e8;
@@ -590,6 +689,7 @@
         }
         .status-chip.new i {
             color: #e74c3c;
+            animation: pulseDot 1.2s infinite;
         }
         .status-chip.confirmed {
             background: #fef5e7;
@@ -613,6 +713,18 @@
             color: #27ae60;
         }
 
+        @keyframes pulseDot {
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.4);
+                opacity: 0.6;
+            }
+        }
+
         /* Order actions */
         .order-actions {
             display: flex;
@@ -632,14 +744,26 @@
             background: var(--surface-alt);
             color: var(--text-muted);
             border: 1px solid transparent;
-            transition: all var(--transition);
+            transition: all var(--transition-bounce);
             font-size: 16px;
         }
         .action-btn:hover {
             background: var(--primary-light);
             color: var(--primary);
-            transform: scale(1.08);
+            transform: scale(1.12) rotate(6deg);
             border-color: var(--accent-rose);
+            box-shadow: 0 4px 12px rgba(124, 79, 94, 0.15);
+        }
+        .action-btn:hover i {
+            animation: iconSpin 0.6s ease;
+        }
+        @keyframes iconSpin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(180deg);
+            }
         }
         .action-btn:active {
             transform: scale(0.92);
@@ -652,7 +776,7 @@
         .action-btn.primary-action:hover {
             background: var(--primary-dark);
             box-shadow: 0 6px 20px rgba(124, 79, 94, 0.35);
-            transform: scale(1.08);
+            transform: scale(1.12);
         }
         .action-btn.primary-action:active {
             transform: scale(0.92);
@@ -677,6 +801,7 @@
             color: var(--border-light);
             margin-bottom: 20px;
             display: block;
+            animation: float 3s ease-in-out infinite;
         }
         .empty-state h3 {
             font-family: 'Playfair Display', serif;
@@ -889,9 +1014,11 @@
     ============================================================ -->
     <nav class="sidebar" id="sidebar" role="navigation" aria-label="Navigation principale">
         <div class="sidebar-brand">
-            <div class="brand-icon" aria-hidden="true">
-                <i class="fa-solid fa-utensils"></i>
-            </div>
+            <img
+            src="logo.jpg"
+            alt="The Little Spoon logo"
+            class="brand-logo"
+            />
             <div>
                 <h1>The Little <span>Spoon</span></h1>
                 <div class="sub">Administration</div>
@@ -1049,21 +1176,18 @@
 
             overlay.addEventListener('click', closeSidebar);
 
-            // Close on Escape key
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape' && sidebar.classList.contains('open')) {
                     closeSidebar();
                 }
             });
 
-            // Close on window resize > 820px
             window.addEventListener('resize', function() {
                 if (window.innerWidth > 820 && sidebar.classList.contains('open')) {
                     closeSidebar();
                 }
             });
 
-            // Close when a nav link is clicked (mobile)
             document.querySelectorAll('.nav-link').forEach(function(link) {
                 link.addEventListener('click', function() {
                     if (window.innerWidth <= 820) {
@@ -1078,18 +1202,7 @@
         // ============================================================
         document.addEventListener('DOMContentLoaded', function() {
             const pills = document.querySelectorAll('.filter-pill');
-            const ordersList = document.getElementById('ordersList');
 
-            // When a pill is clicked, we let commandes.js handle the filtering.
-            // But we also need to keep the UI in sync.
-            // The commandes.js file already handles filter clicks via event delegation.
-            // We'll just make sure the active class is applied correctly.
-
-            // Override the filter behavior slightly to update counts
-            // The commandes.js file should handle this, but we'll add a mutation observer
-            // to keep counts in sync with the actual orders data.
-
-            // We'll use a custom event to update counts after orders are loaded/filtered.
             document.addEventListener('ordersUpdated', function(e) {
                 const counts = e.detail.counts || {};
                 document.getElementById('countAll').textContent = counts.all || 0;
@@ -1099,7 +1212,6 @@
                 document.getElementById('countLivrée').textContent = counts.livrée || 0;
             });
 
-            // Also update stats when orders change
             document.addEventListener('statsUpdated', function(e) {
                 const stats = e.detail || {};
                 document.getElementById('statNewNumber').textContent = stats.newToday !== undefined ? stats.newToday :
@@ -1119,7 +1231,6 @@
 
             text.textContent = message;
 
-            // Update icon
             if (type === 'success') {
                 icon.className = 'fa-regular fa-circle-check';
                 toast.className = 'toast success';
@@ -1138,7 +1249,6 @@
             }, 3000);
         }
 
-        // Expose toast globally for commandes.js
         window.showToast = showToast;
 
         // ============================================================
@@ -1146,10 +1256,8 @@
         // ============================================================
         function logout() {
             if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
-                // Clear any auth tokens
                 localStorage.removeItem('authToken');
                 sessionStorage.removeItem('authToken');
-                // Redirect to login
                 window.location.href = 'login.html';
             }
         }
