@@ -22,71 +22,81 @@ function isAuthorized(req) {
 
 export default async function handler(req, res) {
   if (!isAuthorized(req)) {
-    return res.status(401).json({ error: 'Non autorisé' });
+    return res.status(401).json({ error: 'Unauthorized' });
   }
 
   // GET all categories
   if (req.method === 'GET') {
     try {
-      const { rows } = await sql`SELECT * FROM categories ORDER BY name ASC`;
+      const { rows } = await sql`SELECT id, name, slug, sort_order, created_at FROM categories ORDER BY sort_order ASC, name ASC`;
       return res.status(200).json(rows);
     } catch (err) {
-      return res.status(500).json({ error: 'Erreur serveur' });
+      console.error('GET /api/categories error:', err);
+      return res.status(500).json({ error: 'Server error' });
     }
   }
 
-  // POST create a new category
+  // POST create category
   if (req.method === 'POST') {
-    const { name } = req.body || {};
+    const { name, slug, sort_order } = req.body || {};
     if (!name || !name.trim()) {
-      return res.status(400).json({ error: 'Nom requis' });
+      return res.status(400).json({ error: 'Name required' });
+    }
+    if (!slug || !slug.trim()) {
+      return res.status(400).json({ error: 'Slug required' });
     }
     try {
       const { rows } = await sql`
-        INSERT INTO categories (name) VALUES (${name.trim()}) RETURNING id
+        INSERT INTO categories (name, slug, sort_order)
+        VALUES (${name.trim()}, ${slug.trim()}, ${sort_order || 0})
+        RETURNING id
       `;
       return res.status(200).json({ success: true, id: rows[0].id });
     } catch (err) {
-      return res.status(500).json({ error: 'Erreur serveur' });
+      console.error('POST /api/categories error:', err);
+      return res.status(500).json({ error: 'Server error' });
     }
   }
 
-  // PUT update a category
+  // PUT update category
   if (req.method === 'PUT') {
-    const { id, name } = req.body || {};
-    if (!id) return res.status(400).json({ error: 'id requis' });
-    if (!name || !name.trim()) return res.status(400).json({ error: 'Nom requis' });
+    const { id, name, slug, sort_order } = req.body || {};
+    if (!id) return res.status(400).json({ error: 'id required' });
+    if (!name || !name.trim()) return res.status(400).json({ error: 'Name required' });
+    if (!slug || !slug.trim()) return res.status(400).json({ error: 'Slug required' });
 
     try {
       const { rowCount } = await sql`
-        UPDATE categories SET name = ${name.trim()} WHERE id = ${id}
+        UPDATE categories SET name = ${name.trim()}, slug = ${slug.trim()}, sort_order = ${sort_order || 0}
+        WHERE id = ${id}
       `;
       if (rowCount === 0) {
-        return res.status(404).json({ error: 'Catégorie introuvable' });
+        return res.status(404).json({ error: 'Category not found' });
       }
       return res.status(200).json({ success: true });
     } catch (err) {
-      return res.status(500).json({ error: 'Erreur serveur' });
+      console.error('PUT /api/categories error:', err);
+      return res.status(500).json({ error: 'Server error' });
     }
   }
 
-  // DELETE a category
+  // DELETE category
   if (req.method === 'DELETE') {
     const { id } = req.body || {};
-    if (!id) return res.status(400).json({ error: 'id requis' });
+    if (!id) return res.status(400).json({ error: 'id required' });
 
     try {
-      // Check if any products use this category
       const { rows } = await sql`SELECT id FROM products WHERE category_id = ${id} LIMIT 1`;
       if (rows.length > 0) {
-        return res.status(400).json({ error: 'Cette catégorie est utilisée par des produits' });
+        return res.status(400).json({ error: 'Category is used by products' });
       }
       await sql`DELETE FROM categories WHERE id = ${id}`;
       return res.status(200).json({ success: true });
     } catch (err) {
-      return res.status(500).json({ error: 'Erreur serveur' });
+      console.error('DELETE /api/categories error:', err);
+      return res.status(500).json({ error: 'Server error' });
     }
   }
 
-  return res.status(405).json({ error: 'Méthode non autorisée' });
+  return res.status(405).json({ error: 'Method not allowed' });
 }
