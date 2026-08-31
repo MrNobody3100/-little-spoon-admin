@@ -2,7 +2,7 @@ import { put } from '@vercel/blob';
 import crypto from 'crypto';
 
 const COOKIE_NAME = 'tls_admin_session';
-const MAX_BYTES = 4 * 1024 * 1024; // 4MB safety limit (serverless body limit is ~4.5MB)
+const MAX_BYTES = 4 * 1024 * 1024; // 4MB
 
 function isAuthorized(req) {
   const secret = process.env.SESSION_SECRET;
@@ -23,37 +23,45 @@ function isAuthorized(req) {
 
 export default async function handler(req, res) {
   if (!isAuthorized(req)) {
-    return res.status(401).json({ error: 'Non autorisé' });
+    return res.status(401).json({ error: 'Unauthorized' });
   }
+
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Méthode non autorisée' });
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   const { filename, contentType, dataBase64 } = req.body || {};
 
   if (!filename || !contentType || !dataBase64) {
-    return res.status(400).json({ error: 'Champs manquants (filename, contentType, dataBase64)' });
+    return res.status(400).json({ error: 'Missing fields (filename, contentType, dataBase64)' });
   }
   if (!contentType.startsWith('image/')) {
-    return res.status(400).json({ error: 'Seules les images sont autorisées' });
+    return res.status(400).json({ error: 'Only images are allowed' });
+  }
+
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    console.error('BLOB_READ_WRITE_TOKEN is missing');
+    return res.status(500).json({ error: 'Storage configuration missing' });
   }
 
   try {
     const buffer = Buffer.from(dataBase64, 'base64');
     if (buffer.length > MAX_BYTES) {
-      return res.status(400).json({ error: 'Image trop volumineuse (max 4MB)' });
+      return res.status(400).json({ error: 'Image too large (max 4MB)' });
     }
 
-    const safeName = `products/${Date.now()}-${filename.replace(/[^a-zA-Z0-9.\-_]/g, '_')}`;
+    const timestamp = Date.now();
+    const safeName = `products/${timestamp}-${filename.replace(/[^a-zA-Z0-9.\-_]/g, '_')}`;
 
     const blob = await put(safeName, buffer, {
       access: 'public',
       contentType,
-      token: process.env.BLOB_READ_WRITE_TOKEN
+      token: process.env.BLOB_READ_WRITE_TOKEN,
     });
 
     return res.status(200).json({ url: blob.url });
   } catch (err) {
-    return res.status(500).json({ error: 'Erreur lors du téléversement' });
+    console.error('Upload error:', err);
+    return res.status(500).json({ error: 'Upload error: ' + err.message });
   }
 }
