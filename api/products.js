@@ -22,9 +22,10 @@ function isAuthorized(req) {
 
 export default async function handler(req, res) {
   if (!isAuthorized(req)) {
-    return res.status(401).json({ error: 'Non autorisé' });
+    return res.status(401).json({ error: 'Unauthorized' });
   }
 
+  // GET all products
   if (req.method === 'GET') {
     try {
       const { rows } = await sql`
@@ -38,14 +39,16 @@ export default async function handler(req, res) {
       `;
       return res.status(200).json(rows);
     } catch (err) {
-      return res.status(500).json({ error: 'Erreur serveur' });
+      console.error('GET /api/products error:', err);
+      return res.status(500).json({ error: 'Server error' });
     }
   }
 
+  // POST create product
   if (req.method === 'POST') {
     const { name, description, price, imageUrl, categoryId } = req.body || {};
     if (!name || !imageUrl) {
-      return res.status(400).json({ error: 'Nom et photo requis' });
+      return res.status(400).json({ error: 'Name and image URL required' });
     }
     try {
       const { rows } = await sql`
@@ -55,19 +58,21 @@ export default async function handler(req, res) {
       `;
       return res.status(200).json({ success: true, id: rows[0].id });
     } catch (err) {
-      return res.status(500).json({ error: 'Erreur serveur' });
+      console.error('POST /api/products error:', err);
+      return res.status(500).json({ error: 'Server error' });
     }
   }
 
+  // PUT update product
   if (req.method === 'PUT') {
     const { id, name, description, price, imageUrl, categoryId, isAvailable } = req.body || {};
     if (!id) {
-      return res.status(400).json({ error: 'id requis' });
+      return res.status(400).json({ error: 'id required' });
     }
     try {
       const { rows: existingRows } = await sql`SELECT * FROM products WHERE id = ${id}`;
       if (existingRows.length === 0) {
-        return res.status(404).json({ error: 'Produit introuvable' });
+        return res.status(404).json({ error: 'Product not found' });
       }
       const existing = existingRows[0];
 
@@ -92,22 +97,25 @@ export default async function handler(req, res) {
       `;
       return res.status(200).json({ success: true });
     } catch (err) {
-      return res.status(500).json({ error: 'Erreur serveur' });
+      console.error('PUT /api/products error:', err);
+      return res.status(500).json({ error: 'Server error' });
     }
   }
 
+  // DELETE product
   if (req.method === 'DELETE') {
     const { id } = req.body || {};
     if (!id) {
-      return res.status(400).json({ error: 'id requis' });
+      return res.status(400).json({ error: 'id required' });
     }
     try {
       await sql`DELETE FROM products WHERE id = ${id}`;
       return res.status(200).json({ success: true });
     } catch (err) {
-      return res.status(500).json({ error: 'Erreur serveur' });
+      console.error('DELETE /api/products error:', err);
+      return res.status(500).json({ error: 'Server error' });
     }
   }
 
-  return res.status(405).json({ error: 'Méthode non autorisée' });
+  return res.status(405).json({ error: 'Method not allowed' });
 }
