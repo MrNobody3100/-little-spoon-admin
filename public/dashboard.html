@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Commandes — The Little Spoon Admin</title>
+<link rel="stylesheet" href="css/style.css" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet" />
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="sidebar-brand">
+      <div style="width:48px;height:48px;border-radius:50%;background:var(--color-primary-container);display:flex;align-items:center;justify-content:center;font-size:22px;">🥄</div>
+      <div>
+        <h1>The Little Spoon</h1>
+        <p>Admin Dashboard</p>
+      </div>
+    </div>
+
+    <div style="flex:1;">
+      <a href="dashboard.html" class="nav-link active">
+        <span class="material-symbols-outlined">dashboard</span>
+        <span>Commandes</span>
+      </a>
+      <a href="produits.html" class="nav-link">
+        <span class="material-symbols-outlined">bakery_dining</span>
+        <span>Produits</span>
+      </a>
+      <a href="categories.html" class="nav-link">
+        <span class="material-symbols-outlined">category</span>
+        <span>Catégories</span>
+      </a>
+    </div>
+
+    <div class="sidebar-footer">
+      <a href="produits.html?new=1" class="nav-link" style="color:var(--color-primary);">
+        <span class="material-symbols-outlined">add</span>
+        <span>Nouveau produit</span>
+      </a>
+      <a href="#" class="nav-link" onclick="logout(); return false;">
+        <span class="material-symbols-outlined">logout</span>
+        <span>Déconnexion</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Main content -->
+  <main class="main-content">
+    <header style="margin-bottom:40px;">
+      <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:24px;">
+        <div>
+          <h2 style="font-size:36px;color:var(--color-primary);margin-bottom:6px;">Commandes</h2>
+          <p style="color:var(--color-text-light);margin:0;">Gérez les douceurs du jour.</p>
+        </div>
+        <div style="display:flex;gap:16px;">
+          <div class="card stat-card">
+            <div class="stat-label">Nouvelles aujourd'hui</div>
+            <div class="stat-value" id="statNew">—</div>
+          </div>
+          <div class="card stat-card" style="border:1px solid rgba(244,198,212,0.3);">
+            <div class="stat-label">Total commandes</div>
+            <div class="stat-value" id="statTotal">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-row" id="filterRow">
+        <button class="filter-pill active" data-status="all">Toutes</button>
+        <button class="filter-pill" data-status="nouvelle">Nouvelle</button>
+        <button class="filter-pill" data-status="confirmée">Confirmée</button>
+        <button class="filter-pill" data-status="prête">Prête</button>
+        <button class="filter-pill" data-status="livrée">Livrée</button>
+      </div>
+    </header>
+
+    <section id="ordersList" class="card" style="display:flex;flex-direction:column;gap:16px;padding:0;background:transparent;box-shadow:none;">
+      <div class="loading-state">Chargement des commandes...</div>
+    </section>
+  </main>
+</div>
+
+<div class="toast" id="toast">
+  <span class="material-symbols-outlined" style="color:var(--color-on-tertiary-container);">check_circle</span>
+  <span id="toastText">Statut mis à jour</span>
+</div>
+
+<script src="js/auth-check.js"></script>
+<script src="js/commandes.js"></script>
+</body>
+</html>

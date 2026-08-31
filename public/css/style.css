@@ -1,0 +1,236 @@
+/* ==========================================================================
+   The Little Spoon — Admin design system
+   Matches DESIGN.md ("Pâtisserie Douceur")
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Quicksand:wght@300..700&display=swap');
+
+:root {
+  /* Colors */
+  --color-primary: #785460;
+  --color-primary-container: #f4c6d4;
+  --color-primary-dark: #E8A6BC;
+  --color-on-primary-container: #73505c;
+
+  --color-secondary: #745a35;
+  --color-secondary-container: #fddaac;
+  --color-secondary-fixed-dim: #C9A97E;
+
+  --color-tertiary-container: #c1d9b9;
+  --color-on-tertiary-container: #4b6046;
+
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+
+  --color-background: #fff8f5;
+  --color-surface: #ffffff;
+  --color-surface-container-low: #f9f2ef;
+  --color-surface-container: #f3ecea;
+  --color-surface-container-high: #ede7e4;
+
+  --color-text-main: #3A2E2E;
+  --color-text-light: #8B7B7B;
+  --color-outline: #817477;
+  --color-outline-variant: #d3c3c6;
+
+  --color-heart-active: #E0555A;
+
+  /* Radius */
+  --radius-lg: 24px;
+  --radius-card: 24px;
+  --radius-xl: 16px;
+  --radius-full: 999px;
+
+  /* Spacing */
+  --space-base: 8px;
+  --space-gutter: 16px;
+  --space-container-margin: 24px;
+  --space-card-padding: 20px;
+  --space-section-gap: 80px;
+
+  /* Shadows */
+  --shadow-card: 0px 10px 30px rgba(244, 198, 212, 0.2);
+  --shadow-interactive: 0px 12px 36px rgba(244, 198, 212, 0.3);
+
+  /* Type */
+  --font-display: 'Playfair Display', serif;
+  --font-body: 'Quicksand', sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background-color: var(--color-background);
+  color: var(--color-text-main);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.02'/%3E%3C/svg%3E");
+}
+
+h1, h2, h3 { font-family: var(--font-display); margin: 0; }
+
+a { color: inherit; text-decoration: none; }
+
+button { font-family: var(--font-body); cursor: pointer; border: none; background: none; }
+
+input, textarea, select {
+  font-family: var(--font-body);
+  font-size: 16px;
+}
+
+/* ---------- Layout ---------- */
+.app-shell { display: flex; min-height: 100vh; }
+
+.sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-outline-variant);
+  padding: var(--space-gutter);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+}
+
+.sidebar-brand { display: flex; align-items: center; gap: var(--space-gutter); margin-bottom: var(--space-section-gap); }
+.sidebar-brand img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; background: var(--color-primary-container); }
+.sidebar-brand h1 { font-size: 20px; color: var(--color-primary); letter-spacing: -0.01em; }
+.sidebar-brand p { font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--color-text-light); margin: 4px 0 0; }
+
+.nav-link {
+  display: flex; align-items: center; gap: var(--space-gutter);
+  padding: 12px 16px; border-radius: var(--radius-xl);
+  color: var(--color-text-light); font-weight: 600; font-size: 14px;
+  transition: all 0.2s ease; margin-bottom: 6px;
+}
+.nav-link:hover { background: var(--color-surface-container-high); }
+.nav-link.active { background: var(--color-primary-container); color: var(--color-on-primary-container); }
+.nav-link .material-symbols-outlined { font-size: 20px; }
+
+.sidebar-footer { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--color-outline-variant); }
+
+.main-content { flex: 1; margin-left: 260px; padding: 40px; max-width: 1200px; }
+
+@media (max-width: 860px) {
+  .sidebar { display: none; }
+  .main-content { margin-left: 0; padding: var(--space-container-margin); }
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 14px 24px; border-radius: var(--radius-xl);
+  font-weight: 600; font-size: 14px; letter-spacing: 0.03em;
+  transition: all 0.2s cubic-bezier(.4,0,.2,1);
+}
+.btn-primary { background: var(--color-primary-container); color: var(--color-text-main); box-shadow: var(--shadow-interactive); }
+.btn-primary:hover { background: var(--color-primary-dark); transform: scale(1.02); }
+.btn-primary:active { transform: scale(0.98); }
+.btn-secondary { border: 1px solid var(--color-secondary-fixed-dim); color: var(--color-secondary); background: transparent; }
+.btn-secondary:hover { background: var(--color-surface-container-low); }
+.btn-ghost { color: var(--color-primary); }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* ---------- Cards ---------- */
+.card {
+  background: var(--color-surface);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-card-padding);
+}
+
+/* ---------- Chips / status ---------- */
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 16px; border-radius: var(--radius-full);
+  font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+.chip-new { background: var(--color-error-container); color: var(--color-on-error-container); }
+.chip-new .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--color-error); animation: pulse 1.6s infinite; }
+.chip-confirmed { background: var(--color-secondary-container); color: #785e39; }
+.chip-ready { background: #cfe3f5; color: #2a5a86; }
+.chip-delivered { background: var(--color-tertiary-container); color: var(--color-on-tertiary-container); }
+
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+/* ---------- Filter pills ---------- */
+.filter-row { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; }
+.filter-pill {
+  flex-shrink: 0; padding: 10px 22px; border-radius: var(--radius-full);
+  font-size: 14px; font-weight: 600; border: 1px solid var(--color-secondary-fixed-dim);
+  color: var(--color-text-main); background: transparent; transition: all 0.15s ease;
+}
+.filter-pill.active { background: var(--color-primary-container); border-color: transparent; }
+.filter-pill:hover:not(.active) { background: var(--color-surface-container-low); }
+
+/* ---------- Order card ---------- */
+.order-card {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 24px;
+  transition: transform 0.25s ease;
+}
+.order-card:hover { transform: translateY(-2px); }
+.order-col { flex: 1 1 220px; min-width: 0; }
+.order-thumb { width: 64px; height: 64px; border-radius: 12px; object-fit: cover; flex-shrink: 0; background: var(--color-primary-container); }
+.order-customer { display: flex; align-items: center; gap: 16px; }
+.order-name { font-family: var(--font-display); font-size: 18px; margin-bottom: 2px; }
+.order-meta { font-size: 13px; color: var(--color-text-light); display: flex; align-items: center; gap: 4px; }
+.order-actions { display: flex; align-items: center; justify-content: flex-end; gap: 12px; }
+
+.icon-btn {
+  width: 40px; height: 40px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--color-secondary-fixed-dim); color: var(--color-primary);
+  transition: background 0.15s ease;
+}
+.icon-btn:hover { background: rgba(244,198,212,0.2); }
+
+/* ---------- Stats ---------- */
+.stat-card { min-width: 150px; }
+.stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-text-light); margin-bottom: 6px; }
+.stat-value { font-family: var(--font-display); font-size: 32px; color: var(--color-primary); }
+
+/* ---------- Login ---------- */
+.login-wrap {
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+}
+.login-card { width: 100%; max-width: 400px; text-align: center; }
+.login-logo { width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 20px; background: var(--color-primary-container); display: flex; align-items: center; justify-content: center; font-size: 32px; }
+.login-card h1 { color: var(--color-primary); font-size: 28px; margin-bottom: 6px; }
+.login-card p { color: var(--color-text-light); margin-bottom: 28px; font-size: 14px; }
+
+.field { text-align: left; margin-bottom: 18px; }
+.field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--color-text-main); }
+.field input, .field textarea {
+  width: 100%; padding: 14px 16px; border-radius: var(--radius-xl);
+  border: 1px solid var(--color-secondary-fixed-dim); background: var(--color-surface);
+  outline: none; transition: box-shadow 0.15s ease;
+}
+.field input:focus, .field textarea:focus { box-shadow: 0 0 0 4px rgba(244,198,212,0.35); }
+
+.error-text { color: var(--color-error); font-size: 13px; margin-top: -8px; margin-bottom: 16px; min-height: 18px; }
+
+/* ---------- Empty / loading states ---------- */
+.empty-state, .loading-state {
+  text-align: center; padding: 60px 20px; color: var(--color-text-light);
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--color-surface-container-low) 25%, var(--color-surface-container-high) 37%, var(--color-surface-container-low) 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+  border-radius: var(--radius-xl);
+}
+@keyframes shimmer { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
+
+/* ---------- Toast ---------- */
+.toast {
+  position: fixed; bottom: 32px; left: 50%; transform: translate(-50%, 100px);
+  background: var(--color-surface); padding: 16px 24px; border-radius: var(--radius-full);
+  box-shadow: var(--shadow-interactive); display: flex; align-items: center; gap: 12px;
+  opacity: 0; transition: all 0.4s cubic-bezier(.4,0,.2,1); z-index: 999;
+  border: 1px solid var(--color-primary-container); font-size: 14px; font-weight: 600;
+}
+.toast.show { transform: translate(-50%, 0); opacity: 1; }
