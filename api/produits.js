@@ -1,6 +1,6 @@
 import { sql } from '@vercel/postgres';
 import crypto from 'crypto';
-
+const aaa = ''
 const COOKIE_NAME = 'tls_admin_session';
 
 function isAuthorized(req) {
