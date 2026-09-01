@@ -4,7 +4,7 @@
   "private": true,
   "description": "The Little Spoon — Admin site (vanilla HTML/CSS/JS + Vercel serverless functions)",
   "dependencies": {
-    "@vercel/postgres": "^0.10.0",
+    "pg": "^8.13.0",
     "@vercel/blob": "^0.27.0"
   }
 }
