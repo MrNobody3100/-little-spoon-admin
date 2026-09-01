@@ -3,222 +3,237 @@ import crypto from 'crypto';
 
 const COOKIE_NAME = 'tls_admin_session';
 
-function isAuthorized(req) {
+export default async function handler(req, res) {
+  // Always return JSON
+  res.setHeader('Content-Type', 'application/json');
+
+  console.log('📡 /api/categories called');
+
   try {
+    // ---- STEP 1: Check SESSION_SECRET ----
     const secret = process.env.SESSION_SECRET;
     if (!secret) {
-      console.error('❌ SESSION_SECRET is NOT set in environment');
-      return false;
+      console.error('❌ SESSION_SECRET missing');
+      return res.status(500).json({ 
+        error: 'SESSION_SECRET missing',
+        step: 1
+      });
+    }
+    console.log('✅ SESSION_SECRET exists');
+
+    // ---- STEP 2: Check database connection ----
+    try {
+      const test = await sql`SELECT NOW() as now`;
+      console.log('✅ Database connected:', test.rows[0].now);
+    } catch (dbErr) {
+      console.error('❌ Database error:', dbErr.message);
+      return res.status(500).json({ 
+        error: 'Database connection failed', 
+        details: dbErr.message,
+        step: 2
+      });
     }
 
+    // ---- STEP 3: Check if categories table exists ----
+    try {
+      const tableCheck = await sql`
+        SELECT EXISTS (
+          SELECT 1 FROM information_schema.tables 
+          WHERE table_schema = 'public' 
+          AND table_name = 'categories'
+        ) as exists
+      `;
+      
+      if (!tableCheck.rows[0].exists) {
+        console.error('❌ Categories table missing');
+        return res.status(500).json({ 
+          error: 'Categories table does not exist',
+          step: 3
+        });
+      }
+      console.log('✅ Categories table exists');
+    } catch (tableErr) {
+      console.error('❌ Table check error:', tableErr.message);
+      return res.status(500).json({ 
+        error: 'Error checking table',
+        details: tableErr.message,
+        step: 3
+      });
+    }
+
+    // ---- STEP 4: Check auth cookie ----
     const cookieHeader = req.headers.cookie || '';
     const match = cookieHeader.split(';').map(c => c.trim()).find(c => c.startsWith(`${COOKIE_NAME}=`));
+    
     if (!match) {
-      console.log('⚠️ No cookie found');
-      return false;
+      console.log('⚠️ No auth cookie found');
+      return res.status(401).json({ 
+        error: 'Non autorisé - No cookie',
+        step: 4
+      });
     }
 
-    const raw = decodeURIComponent(match.split('=').slice(1).join('='));
-    const [value, hmac] = raw.split('.');
-    if (!value || !hmac) {
-      console.log('⚠️ Invalid cookie format');
-      return false;
-    }
+    console.log('✅ Auth cookie found');
 
-    const expected = crypto.createHmac('sha256', secret).update(value).digest('hex');
-    if (hmac.length !== expected.length) {
-      console.log('⚠️ HMAC length mismatch');
-      return false;
-    }
-    
-    const valid = crypto.timingSafeEqual(Buffer.from(hmac), Buffer.from(expected));
-    const isExpired = Date.now() > Number(value);
-    
-    if (isExpired) console.log('⚠️ Session expired');
-    if (!valid) console.log('⚠️ Invalid signature');
-    
-    return valid && !isExpired;
-  } catch (err) {
-    console.error('❌ Auth error:', err.message);
-    return false;
-  }
-}
-
-export default async function handler(req, res) {
-  console.log(`📡 ${req.method} /api/categories - ${new Date().toISOString()}`);
-
-  // --- First, check database connection ---
-  try {
-    const result = await sql`SELECT NOW() as current_time`;
-    console.log('✅ Database connected successfully at:', result.rows[0].current_time);
-  } catch (dbErr) {
-    console.error('❌ Database connection FAILED:', dbErr.message);
-    console.error('Stack:', dbErr.stack);
-    return res.status(500).json({ 
-      error: 'Database connection failed', 
-      details: dbErr.message,
-      hint: 'Check if Vercel Postgres is attached to your project'
-    });
-  }
-
-  // --- Check authentication ---
-  const authorized = isAuthorized(req);
-  console.log(`🔐 Authenticated: ${authorized}`);
-  
-  if (!authorized) {
-    return res.status(401).json({ error: 'Non autorisé' });
-  }
-
-  // --- GET all categories ---
-  if (req.method === 'GET') {
+    // ---- STEP 5: Verify cookie signature ----
     try {
-      console.log('📥 Fetching categories...');
-      const { rows } = await sql`
-        SELECT id, name, slug, sort_order, created_at 
-        FROM categories 
-        ORDER BY sort_order ASC, name ASC
-      `;
-      console.log(`✅ Found ${rows.length} categories`);
-      return res.status(200).json(rows);
-    } catch (err) {
-      console.error('❌ GET error:', err.message);
-      console.error('Full error:', err);
-      
-      // Check if table exists
-      if (err.message.includes('relation "categories" does not exist')) {
-        return res.status(500).json({ 
-          error: 'Categories table does not exist', 
-          details: 'Please create the categories table in your database',
-          hint: 'Run: CREATE TABLE categories (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), name TEXT NOT NULL, slug TEXT UNIQUE NOT NULL, sort_order INTEGER DEFAULT 0, created_at TIMESTAMPTZ DEFAULT NOW())'
+      const raw = decodeURIComponent(match.split('=').slice(1).join('='));
+      const [value, hmac] = raw.split('.');
+      if (!value || !hmac) {
+        return res.status(401).json({ 
+          error: 'Invalid cookie format',
+          step: 5
+        });
+      }
+
+      const expected = crypto.createHmac('sha256', secret).update(value).digest('hex');
+      if (hmac.length !== expected.length) {
+        return res.status(401).json({ 
+          error: 'HMAC length mismatch',
+          step: 5
         });
       }
       
-      return res.status(500).json({ error: 'Erreur serveur', details: err.message });
-    }
-  }
-
-  // --- POST create category ---
-  if (req.method === 'POST') {
-    const { name, slug, sort_order } = req.body || {};
-    console.log(`📝 Creating category: name="${name}", slug="${slug}", sort_order=${sort_order || 0}`);
-
-    // Validate inputs
-    if (!name || !name.trim()) {
-      console.log('❌ Missing name');
-      return res.status(400).json({ error: 'Nom requis' });
-    }
-    if (!slug || !slug.trim()) {
-      console.log('❌ Missing slug');
-      return res.status(400).json({ error: 'Slug requis' });
-    }
-
-    try {
-      // Check if slug already exists
-      const { rows: existing } = await sql`
-        SELECT id FROM categories WHERE slug = ${slug.trim()}
-      `;
-      if (existing.length > 0) {
-        console.log(`⚠️ Slug "${slug}" already exists`);
-        return res.status(400).json({ error: 'Ce slug est déjà utilisé' });
+      const valid = crypto.timingSafeEqual(Buffer.from(hmac), Buffer.from(expected));
+      if (!valid) {
+        return res.status(401).json({ 
+          error: 'Invalid signature',
+          step: 5
+        });
       }
 
-      // Insert new category
-      const { rows } = await sql`
-        INSERT INTO categories (name, slug, sort_order)
-        VALUES (${name.trim()}, ${slug.trim()}, ${sort_order || 0})
-        RETURNING id
-      `;
-      
-      console.log(`✅ Category created with ID: ${rows[0].id}`);
-      return res.status(200).json({ success: true, id: rows[0].id });
-    } catch (err) {
-      console.error('❌ POST error:', err.message);
-      console.error('Full error:', err);
-      
-      if (err.message.includes('duplicate key')) {
-        return res.status(400).json({ error: 'Ce slug existe déjà' });
+      if (Date.now() > Number(value)) {
+        return res.status(401).json({ 
+          error: 'Session expired',
+          step: 5
+        });
       }
-      
-      return res.status(500).json({ 
-        error: 'Erreur serveur', 
-        details: err.message,
-        hint: 'Check if categories table exists with correct columns (id, name, slug, sort_order, created_at)'
+
+      console.log('✅ Auth verified');
+
+    } catch (authErr) {
+      console.error('❌ Auth error:', authErr.message);
+      return res.status(401).json({ 
+        error: 'Auth error',
+        details: authErr.message,
+        step: 5
       });
     }
-  }
 
-  // --- PUT update category ---
-  if (req.method === 'PUT') {
-    const { id, name, slug, sort_order } = req.body || {};
-    console.log(`✏️ Updating category: id="${id}", name="${name}", slug="${slug}"`);
-
-    if (!id) return res.status(400).json({ error: 'id requis' });
-    if (!name || !name.trim()) return res.status(400).json({ error: 'Nom requis' });
-    if (!slug || !slug.trim()) return res.status(400).json({ error: 'Slug requis' });
-
-    try {
-      // Check if category exists
-      const { rows: existing } = await sql`
-        SELECT id FROM categories WHERE id = ${id}
-      `;
-      if (existing.length === 0) {
-        return res.status(404).json({ error: 'Catégorie introuvable' });
+    // ---- STEP 6: Handle the request ----
+    if (req.method === 'GET') {
+      try {
+        console.log('📥 Fetching categories...');
+        const { rows } = await sql`
+          SELECT id, name, slug, sort_order, created_at 
+          FROM categories 
+          ORDER BY sort_order ASC, name ASC
+        `;
+        console.log(`✅ Returning ${rows.length} categories`);
+        return res.status(200).json(rows);
+      } catch (err) {
+        console.error('❌ GET error:', err.message);
+        return res.status(500).json({ 
+          error: 'Failed to fetch categories',
+          details: err.message,
+          step: 6
+        });
       }
+    }
 
-      // Check if slug is taken by another category
-      const { rows: slugExists } = await sql`
-        SELECT id FROM categories WHERE slug = ${slug.trim()} AND id != ${id}
-      `;
-      if (slugExists.length > 0) {
-        return res.status(400).json({ error: 'Ce slug est déjà utilisé par une autre catégorie' });
-      }
-
-      const { rowCount } = await sql`
-        UPDATE categories 
-        SET name = ${name.trim()}, slug = ${slug.trim()}, sort_order = ${sort_order || 0}
-        WHERE id = ${id}
-      `;
+    // POST, PUT, DELETE similarly...
+    if (req.method === 'POST') {
+      const { name, slug, sort_order } = req.body || {};
       
-      console.log(`✅ Category ${id} updated (${rowCount} rows affected)`);
-      return res.status(200).json({ success: true });
-    } catch (err) {
-      console.error('❌ PUT error:', err.message);
-      return res.status(500).json({ error: 'Erreur serveur', details: err.message });
-    }
-  }
-
-  // --- DELETE category ---
-  if (req.method === 'DELETE') {
-    const { id } = req.body || {};
-    console.log(`🗑️ Deleting category: id="${id}"`);
-
-    if (!id) return res.status(400).json({ error: 'id requis' });
-
-    try {
-      // Check if category exists
-      const { rows: existing } = await sql`
-        SELECT id FROM categories WHERE id = ${id}
-      `;
-      if (existing.length === 0) {
-        return res.status(404).json({ error: 'Catégorie introuvable' });
+      if (!name || !name.trim()) {
+        return res.status(400).json({ error: 'Nom requis' });
+      }
+      if (!slug || !slug.trim()) {
+        return res.status(400).json({ error: 'Slug requis' });
       }
 
-      // Check if category is used by products
-      const { rows: products } = await sql`
-        SELECT id FROM products WHERE category_id = ${id} LIMIT 1
-      `;
-      if (products.length > 0) {
-        return res.status(400).json({ error: 'Cette catégorie est utilisée par des produits' });
+      try {
+        const { rows } = await sql`
+          INSERT INTO categories (name, slug, sort_order)
+          VALUES (${name.trim()}, ${slug.trim()}, ${sort_order || 0})
+          RETURNING id
+        `;
+        console.log(`✅ Category created: ${rows[0].id}`);
+        return res.status(200).json({ success: true, id: rows[0].id });
+      } catch (err) {
+        console.error('❌ POST error:', err.message);
+        return res.status(500).json({ 
+          error: 'Failed to create category',
+          details: err.message,
+          step: 6
+        });
       }
-
-      await sql`DELETE FROM categories WHERE id = ${id}`;
-      console.log(`✅ Category ${id} deleted`);
-      return res.status(200).json({ success: true });
-    } catch (err) {
-      console.error('❌ DELETE error:', err.message);
-      return res.status(500).json({ error: 'Erreur serveur', details: err.message });
     }
-  }
 
-  return res.status(405).json({ error: 'Méthode non autorisée' });
+    // PUT
+    if (req.method === 'PUT') {
+      const { id, name, slug, sort_order } = req.body || {};
+      
+      if (!id) return res.status(400).json({ error: 'id requis' });
+      if (!name || !name.trim()) return res.status(400).json({ error: 'Nom requis' });
+      if (!slug || !slug.trim()) return res.status(400).json({ error: 'Slug requis' });
+
+      try {
+        const { rowCount } = await sql`
+          UPDATE categories 
+          SET name = ${name.trim()}, slug = ${slug.trim()}, sort_order = ${sort_order || 0}
+          WHERE id = ${id}
+        `;
+        if (rowCount === 0) {
+          return res.status(404).json({ error: 'Catégorie introuvable' });
+        }
+        console.log(`✅ Category updated: ${id}`);
+        return res.status(200).json({ success: true });
+      } catch (err) {
+        console.error('❌ PUT error:', err.message);
+        return res.status(500).json({ 
+          error: 'Failed to update category',
+          details: err.message,
+          step: 6
+        });
+      }
+    }
+
+    // DELETE
+    if (req.method === 'DELETE') {
+      const { id } = req.body || {};
+      
+      if (!id) return res.status(400).json({ error: 'id requis' });
+
+      try {
+        const { rows } = await sql`SELECT id FROM products WHERE category_id = ${id} LIMIT 1`;
+        if (rows.length > 0) {
+          return res.status(400).json({ error: 'Cette catégorie est utilisée par des produits' });
+        }
+
+        await sql`DELETE FROM categories WHERE id = ${id}`;
+        console.log(`✅ Category deleted: ${id}`);
+        return res.status(200).json({ success: true });
+      } catch (err) {
+        console.error('❌ DELETE error:', err.message);
+        return res.status(500).json({ 
+          error: 'Failed to delete category',
+          details: err.message,
+          step: 6
+        });
+      }
+    }
+
+    return res.status(405).json({ error: 'Méthode non autorisée' });
+
+  } catch (err) {
+    // Catch any uncaught errors
+    console.error('❌ UNHANDLED ERROR:', err.message);
+    console.error('Stack:', err.stack);
+    return res.status(500).json({ 
+      error: 'Unhandled server error',
+      details: err.message,
+      stack: err.stack
+    });
+  }
 }
