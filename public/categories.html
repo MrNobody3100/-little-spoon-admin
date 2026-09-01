@@ -1109,9 +1109,20 @@
 
             try {
                 const response = await fetch('/api/categories');
-                if (!response.ok) throw new Error('Erreur chargement catégories');
 
-                const categories = await response.json();
+const result = await response.json();
+
+if (!response.ok) {
+    console.error('API /api/categories error:', result);
+
+    throw new Error(
+        result.details
+            ? `${result.error} — ${result.details}`
+            : result.error || `Erreur HTTP ${response.status}`
+    );
+}
+
+const categories = result;
                 renderCategoryList(categories, container);
             } catch (err) {
                 container.innerHTML = `
