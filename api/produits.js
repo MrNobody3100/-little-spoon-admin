@@ -1,4 +1,4 @@
-import { sql } from '@vercel/postgres';
+import { query } from '../lib/db.js';
 import crypto from 'crypto';
 
 const COOKIE_NAME = 'tls_admin_session';
@@ -11,7 +11,10 @@ function isAuthorized(req) {
   }
 
   const cookieHeader = req.headers.cookie || '';
-  const match = cookieHeader.split(';').map(c => c.trim()).find(c => c.startsWith(`${COOKIE_NAME}=`));
+  const match = cookieHeader
+    .split(';')
+    .map((c) => c.trim())
+    .find((c) => c.startsWith(`${COOKIE_NAME}=`));
   if (!match) return false;
 
   const raw = decodeURIComponent(match.split('=').slice(1).join('='));
@@ -24,7 +27,7 @@ function isAuthorized(req) {
     const valid = crypto.timingSafeEqual(Buffer.from(hmac), Buffer.from(expected));
     return valid && Date.now() <= Number(value);
   } catch (err) {
-    console.error('Erreur d\'auth:', err);
+    console.error("Erreur d'auth:", err);
     return false;
   }
 }
@@ -39,7 +42,7 @@ export default async function handler(req, res) {
   // --- GET : liste de tous les produits avec leur catégorie ---
   if (req.method === 'GET') {
     try {
-      const { rows } = await sql`
+      const { rows } = await query(`
         SELECT
           p.id, p.name, p.description, p.price, p.image_url,
           p.is_available, p.created_at,
@@ -47,17 +50,11 @@ export default async function handler(req, res) {
         FROM products p
         LEFT JOIN categories c ON c.id = p.category_id
         ORDER BY p.created_at DESC
-      `;
+      `);
       return res.status(200).json(rows);
     } catch (err) {
-      // TEMPORAIRE : on renvoie le détail pour diagnostiquer, à retirer une fois corrigé
       console.error('❌ GET /api/produits error:', err.message);
-      console.error(err.stack);
-      return res.status(500).json({
-        error: 'Erreur serveur',
-        details: err.message,
-        code: err.code || null
-      });
+      return res.status(500).json({ error: 'Erreur serveur', details: err.message, code: err.code || null });
     }
   }
 
@@ -69,11 +66,11 @@ export default async function handler(req, res) {
     }
 
     try {
-      const { rows } = await sql`
-        INSERT INTO products (name, description, price, image_url, category_id)
-        VALUES (${name.trim()}, ${description || null}, ${price || null}, ${imageUrl}, ${categoryId || null})
-        RETURNING id
-      `;
+      const { rows } = await query(
+        `INSERT INTO products (name, description, price, image_url, category_id)
+         VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+        [name.trim(), description || null, price || null, imageUrl, categoryId || null]
+      );
       return res.status(200).json({ success: true, id: rows[0].id });
     } catch (err) {
       console.error('❌ POST /api/produits error:', err.message);
@@ -84,15 +81,11 @@ export default async function handler(req, res) {
   // --- PUT : mise à jour d'un produit ---
   if (req.method === 'PUT') {
     const { id, name, description, price, imageUrl, categoryId, isAvailable } = req.body || {};
-    if (!id) {
-      return res.status(400).json({ error: 'id requis' });
-    }
+    if (!id) return res.status(400).json({ error: 'id requis' });
 
     try {
-      const { rows: existingRows } = await sql`SELECT * FROM products WHERE id = ${id}`;
-      if (existingRows.length === 0) {
-        return res.status(404).json({ error: 'Produit introuvable' });
-      }
+      const { rows: existingRows } = await query('SELECT * FROM products WHERE id = $1', [id]);
+      if (existingRows.length === 0) return res.status(404).json({ error: 'Produit introuvable' });
       const existing = existingRows[0];
 
       const merged = {
@@ -104,16 +97,21 @@ export default async function handler(req, res) {
         is_available: isAvailable !== undefined ? isAvailable : existing.is_available
       };
 
-      await sql`
-        UPDATE products SET
-          name = ${merged.name},
-          description = ${merged.description},
-          price = ${merged.price},
-          image_url = ${merged.image_url},
-          category_id = ${merged.category_id},
-          is_available = ${merged.is_available}
-        WHERE id = ${id}
-      `;
+      await query(
+        `UPDATE products SET
+           name = $1, description = $2, price = $3,
+           image_url = $4, category_id = $5, is_available = $6
+         WHERE id = $7`,
+        [
+          merged.name,
+          merged.description,
+          merged.price,
+          merged.image_url,
+          merged.category_id,
+          merged.is_available,
+          id
+        ]
+      );
       return res.status(200).json({ success: true });
     } catch (err) {
       console.error('❌ PUT /api/produits error:', err.message);
@@ -124,12 +122,10 @@ export default async function handler(req, res) {
   // --- DELETE : suppression d'un produit ---
   if (req.method === 'DELETE') {
     const { id } = req.body || {};
-    if (!id) {
-      return res.status(400).json({ error: 'id requis' });
-    }
+    if (!id) return res.status(400).json({ error: 'id requis' });
 
     try {
-      await sql`DELETE FROM products WHERE id = ${id}`;
+      await query('DELETE FROM products WHERE id = $1', [id]);
       return res.status(200).json({ success: true });
     } catch (err) {
       console.error('❌ DELETE /api/produits error:', err.message);
