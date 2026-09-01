@@ -30,7 +30,8 @@ function isAuthorized(req) {
 }
 
 export default async function handler(req, res) {
-  // Vérification de l'authentification
+  res.setHeader('Content-Type', 'application/json');
+
   if (!isAuthorized(req)) {
     return res.status(401).json({ error: 'Non autorisé' });
   }
@@ -49,8 +50,14 @@ export default async function handler(req, res) {
       `;
       return res.status(200).json(rows);
     } catch (err) {
-      console.error('GET /api/produits error:', err);
-      return res.status(500).json({ error: 'Erreur serveur' });
+      // TEMPORAIRE : on renvoie le détail pour diagnostiquer, à retirer une fois corrigé
+      console.error('❌ GET /api/produits error:', err.message);
+      console.error(err.stack);
+      return res.status(500).json({
+        error: 'Erreur serveur',
+        details: err.message,
+        code: err.code || null
+      });
     }
   }
 
@@ -69,8 +76,8 @@ export default async function handler(req, res) {
       `;
       return res.status(200).json({ success: true, id: rows[0].id });
     } catch (err) {
-      console.error('POST /api/produits error:', err);
-      return res.status(500).json({ error: 'Erreur serveur' });
+      console.error('❌ POST /api/produits error:', err.message);
+      return res.status(500).json({ error: 'Erreur serveur', details: err.message, code: err.code || null });
     }
   }
 
@@ -109,8 +116,8 @@ export default async function handler(req, res) {
       `;
       return res.status(200).json({ success: true });
     } catch (err) {
-      console.error('PUT /api/produits error:', err);
-      return res.status(500).json({ error: 'Erreur serveur' });
+      console.error('❌ PUT /api/produits error:', err.message);
+      return res.status(500).json({ error: 'Erreur serveur', details: err.message, code: err.code || null });
     }
   }
 
@@ -125,11 +132,10 @@ export default async function handler(req, res) {
       await sql`DELETE FROM products WHERE id = ${id}`;
       return res.status(200).json({ success: true });
     } catch (err) {
-      console.error('DELETE /api/produits error:', err);
-      return res.status(500).json({ error: 'Erreur serveur' });
+      console.error('❌ DELETE /api/produits error:', err.message);
+      return res.status(500).json({ error: 'Erreur serveur', details: err.message, code: err.code || null });
     }
   }
 
-  // Méthode non autorisée
   return res.status(405).json({ error: 'Méthode non autorisée' });
 }
