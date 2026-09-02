@@ -21,8 +21,17 @@ function getPool() {
       );
     }
 
+    // IMPORTANT : pg ignore silencieusement l'objet `ssl` ci-dessous si l'URL
+    // contient un paramètre sslmode (Supabase en ajoute un par défaut) — la
+    // config parsée depuis l'URL prend le dessus et refait une vérification
+    // stricte du certificat, d'où "self-signed certificate in certificate chain".
+    // On retire donc sslmode de l'URL pour que notre objet ssl explicite s'applique.
+    const cleanedConnectionString = connectionString.replace(/([&?])sslmode=[^&]*&?/i, (match, sep) =>
+      match.endsWith('&') ? sep : ''
+    );
+
     pool = new Pool({
-      connectionString,
+      connectionString: cleanedConnectionString,
       ssl: { rejectUnauthorized: false },
       max: 5
     });
