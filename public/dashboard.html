@@ -267,11 +267,10 @@
            MAIN CONTENT
            ============================================================ */
         .main-content {
-            flex: 1;
             margin-left: 270px;
+            width: calc(100vw - 270px);
+            max-width: none;
             padding: 32px 44px 60px;
-            max-width: 1280px;
-            width: 100%;
             transition: margin 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             overflow-x: hidden;
         }
@@ -477,8 +476,10 @@
         /* ---------- Orders container ---------- */
         .orders-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(min(360px, 100%), 1fr));
             gap: 18px;
+            width: 100%;
+            min-width: 0;
             animation: fadeUp 0.5s ease forwards;
         }
 
@@ -498,6 +499,8 @@
             flex-direction: column;
             align-items: stretch;
             gap: 18px 24px;
+            min-width: 0;
+            width: 100%;
             transition: all var(--transition-bounce);
             position: relative;
             overflow: hidden;
@@ -832,6 +835,8 @@
             }
             .main-content {
                 margin-left: 0;
+                width: 100%;
+                max-width: none;
                 padding: 24px 20px 40px;
                 padding-top: 76px;
             }
