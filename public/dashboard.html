@@ -15,7 +15,7 @@
 
     <style>
         /* ============================================================
-           THE LITTLE SPOON — Dashboard (Phosphor icons, grid toggle)
+           THE LITTLE SPOON — Dashboard (Phosphor icons, responsive card layout)
            ============================================================ */
 
         *,
@@ -474,19 +474,12 @@
             color: var(--text-main);
         }
 
-        /* ---------- Orders container (flex list by default) ---------- */
+        /* ---------- Orders container ---------- */
         .orders-container {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            animation: fadeUp 0.5s ease forwards;
-        }
-
-        /* Grid view (applied via JS toggle) */
-        .orders-container.grid-view {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 18px;
+            animation: fadeUp 0.5s ease forwards;
         }
 
         @keyframes fadeUp {
@@ -502,8 +495,8 @@
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--border-light);
             display: flex;
-            flex-wrap: wrap;
-            align-items: center;
+            flex-direction: column;
+            align-items: stretch;
             gap: 18px 24px;
             transition: all var(--transition-bounce);
             position: relative;
@@ -675,20 +668,26 @@
             gap: 8px;
             flex-wrap: wrap;
             margin-left: auto;
+            width: 100%;
+            padding-top: 4px;
+            border-top: 1px solid var(--border-light);
         }
 
         .action-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
+            min-height: 40px;
+            padding: 0 14px;
+            border-radius: 10px;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
+            gap: 7px;
             background: var(--surface-alt);
             color: var(--text-muted);
-            border: 1px solid transparent;
-            transition: all var(--transition-bounce);
-            font-size: 16px;
+            border: 1px solid var(--border-light);
+            transition: all var(--transition);
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
         }
         .action-btn:hover {
             background: var(--primary-light);
@@ -697,11 +696,7 @@
             border-color: var(--accent-rose);
             box-shadow: 0 4px 12px rgba(120, 84, 96, 0.15);
         }
-        .action-btn:hover i {
-            animation: iconSpin 0.6s ease;
-        }
-        @keyframes iconSpin {
-            0% { transform: rotate(0deg); }
+        
             100% { transform: rotate(180deg); }
         }
         .action-btn:active {
@@ -858,9 +853,15 @@
                 flex: 1 1 auto;
             }
             .order-actions {
-                margin-left: 0;
-                justify-content: flex-start;
-            }
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-left: auto;
+            width: 100%;
+            padding-top: 4px;
+            border-top: 1px solid var(--border-light);
+        }
             .order-card .order-info .order-name {
                 font-size: 15px;
             }
@@ -868,9 +869,7 @@
                 padding: 8px 16px;
                 font-size: 12px;
             }
-            .orders-container.grid-view {
-                grid-template-columns: 1fr;
-            }
+            .orders-container { grid-template-columns: 1fr; }
         }
 
         @media (max-width: 480px) {
@@ -1037,17 +1036,7 @@
             </button>
         </div>
 
-        <!-- View toggle -->
-        <div class="view-toggle" id="viewToggle">
-            <button class="active" data-view="list" title="Vue liste">
-                <i class="ph-bold ph-list"></i> Liste
-            </button>
-            <button data-view="grid" title="Vue grille">
-                <i class="ph-bold ph-grid-four"></i> Grille
-            </button>
-        </div>
-
-        <!-- Orders list -->
+        <!-- Orders -->
         <section id="ordersList" class="orders-container" aria-label="Liste des commandes">
             <div class="loading-state">
                 <div class="spinner" aria-hidden="true"></div>
@@ -1191,54 +1180,6 @@
             }
         }
         window.logout = logout;
-
-        // ============================================================
-        // VIEW TOGGLE (list / grid) — only adds CSS class, no data changes
-        // ============================================================
-        (function() {
-            const toggleBtns = document.querySelectorAll('#viewToggle button');
-            const ordersContainer = document.getElementById('ordersList');
-
-            toggleBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    toggleBtns.forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-
-                    if (this.dataset.view === 'grid') {
-                        ordersContainer.classList.add('grid-view');
-                    } else {
-                        ordersContainer.classList.remove('grid-view');
-                    }
-                });
-            });
-        })();
-
-        // ============================================================
-        // ADD EDIT BUTTON to each order card after they are rendered
-        // We listen to the 'ordersUpdated' event (dispatched by commandes.js)
-        // to know when orders are loaded, then we insert an edit button.
-        // ============================================================
-        document.addEventListener('ordersUpdated', function() {
-            // Give a small delay for the DOM to update
-            setTimeout(function() {
-                const cards = document.querySelectorAll('.order-card');
-                cards.forEach(card => {
-                    // Check if edit button already exists
-                    if (card.querySelector('.action-btn.edit-btn')) return;
-
-                    const actionsDiv = card.querySelector('.order-actions');
-                    if (!actionsDiv) return;
-
-                    // Create edit button
-                    const editBtn = document.createElement('button');
-                    editBtn.className = 'action-btn edit-btn';
-                    editBtn.title = 'Modifier';
-                    editBtn.innerHTML = '<i class="ph ph-pencil"></i>';
-                    editBtn.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        // Placeholder action — can be connected later
-                        showToast('Fonctionnalité d\'édition à venir', 'info');
-                    });
 
                     // Insert before the delete button (if exists) or at the end
                     const deleteBtn = actionsDiv.querySelector('.action-btn.danger');
