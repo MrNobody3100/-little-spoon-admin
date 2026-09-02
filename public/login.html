@@ -4,9 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Connexion — The Little Spoon Admin</title>
-  <!-- Google Font & Material Symbols (optional but kept) -->
+  <!-- Google Fonts & Material Symbols -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet" />
+  <!-- Font Awesome for cute animated icons (CDN) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
     /* ---------- RESET & BASE ---------- */
     * {
@@ -21,64 +23,12 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #1e1e2f; /* fallback */
-      /* animated gradient background (food‐inspired warm tones) */
-      background: linear-gradient(145deg, #f9e0b0 0%, #f5cba0 40%, #e8b48c 80%, #d99b7a 100%);
-      background-size: 300% 300%;
-      animation: softFoodWave 14s ease-in-out infinite alternate;
       padding: 1rem;
       position: relative;
-      overflow-x: hidden;
-    }
-
-    /* animated background with floating food icons (pseudo & real) */
-    body::before {
-      content: "🍕🍔🍟🌭🥪🍝🍣🍛🍜🍲🍥🍡🍢🍧🍨🍩🍪🎂🍰🧁🥧🍫🍬🍭🍮🍯☕🍵🥤🧃🥛🍺🍷🥂🍹🍾";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      font-size: 3.5rem;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-around;
-      align-items: center;
-      opacity: 0.13;
-      pointer-events: none;
-      z-index: 0;
-      letter-spacing: 20px;
-      word-break: break-all;
-      line-height: 2.2;
-      animation: floatFood 28s linear infinite alternate;
-      transform: scale(1.2);
-    }
-
-    /* extra floating particles (food animation) */
-    .food-particle {
-      position: absolute;
-      font-size: 2.8rem;
-      opacity: 0.2;
-      pointer-events: none;
-      z-index: 0;
-      animation: floatAround 18s infinite alternate ease-in-out;
-      filter: drop-shadow(0 8px 6px rgba(0,0,0,0.05));
-    }
-
-    .food-particle:nth-child(1) { top: 8%; left: 5%; animation-duration: 19s; font-size: 4rem; opacity: 0.18; }
-    .food-particle:nth-child(2) { top: 70%; left: 85%; animation-duration: 22s; font-size: 3.2rem; opacity: 0.2; }
-    .food-particle:nth-child(3) { top: 40%; left: 92%; animation-duration: 16s; font-size: 3rem; opacity: 0.17; }
-    .food-particle:nth-child(4) { top: 15%; left: 88%; animation-duration: 25s; font-size: 3.8rem; opacity: 0.15; }
-    .food-particle:nth-child(5) { top: 85%; left: 12%; animation-duration: 20s; font-size: 3.5rem; opacity: 0.16; }
-    .food-particle:nth-child(6) { top: 55%; left: 3%; animation-duration: 21s; font-size: 2.6rem; opacity: 0.2; }
-    .food-particle:nth-child(7) { top: 25%; left: 20%; animation-duration: 23s; font-size: 3rem; opacity: 0.15; }
-    .food-particle:nth-child(8) { top: 75%; left: 45%; animation-duration: 17s; font-size: 4.2rem; opacity: 0.12; }
-
-    @keyframes floatAround {
-      0% { transform: translate(0, 0) rotate(0deg) scale(1); }
-      33% { transform: translate(30px, -40px) rotate(8deg) scale(1.1); }
-      66% { transform: translate(-20px, 30px) rotate(-5deg) scale(0.95); }
-      100% { transform: translate(15px, -15px) rotate(3deg) scale(1.05); }
+      overflow: hidden;
+      background: linear-gradient(145deg, #f9e0b0 0%, #f5cba0 40%, #e8b48c 80%, #d99b7a 100%);
+      background-size: 300% 300%;
+      animation: softFoodWave 16s ease-in-out infinite alternate;
     }
 
     @keyframes softFoodWave {
@@ -87,9 +37,45 @@
       100% { background-position: 0% 0%; }
     }
 
+    /* ---------- ANIMATED FOOD BACKGROUND (Font Awesome icons) ---------- */
+    .food-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .food-icon {
+      position: absolute;
+      font-size: 3.5rem;
+      animation: floatFood 20s infinite alternate ease-in-out;
+      opacity: 0.15;
+      color: #5a4030;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.05));
+    }
+
+    .food-icon:nth-child(1) { top: 5%; left: 3%; animation-duration: 22s; opacity: 0.18; font-size: 4rem; }
+    .food-icon:nth-child(2) { top: 78%; right: 2%; animation-duration: 26s; opacity: 0.14; font-size: 4.5rem; }
+    .food-icon:nth-child(3) { top: 45%; right: 5%; animation-duration: 19s; opacity: 0.16; font-size: 3.8rem; }
+    .food-icon:nth-child(4) { top: 12%; right: 15%; animation-duration: 24s; opacity: 0.13; font-size: 4.2rem; }
+    .food-icon:nth-child(5) { bottom: 10%; left: 5%; animation-duration: 21s; opacity: 0.17; font-size: 3.5rem; }
+    .food-icon:nth-child(6) { top: 55%; left: 2%; animation-duration: 23s; opacity: 0.19; font-size: 3.2rem; }
+    .food-icon:nth-child(7) { top: 25%; left: 20%; animation-duration: 27s; opacity: 0.12; font-size: 4rem; }
+    .food-icon:nth-child(8) { bottom: 22%; left: 45%; animation-duration: 25s; opacity: 0.11; font-size: 4.8rem; }
+    .food-icon:nth-child(9) { top: 65%; left: 40%; animation-duration: 20s; opacity: 0.20; font-size: 3rem; }
+    .food-icon:nth-child(10) { top: 8%; left: 45%; animation-duration: 28s; opacity: 0.10; font-size: 3.8rem; }
+    .food-icon:nth-child(11) { bottom: 40%; right: 20%; animation-duration: 30s; opacity: 0.12; font-size: 4rem; }
+    .food-icon:nth-child(12) { top: 35%; left: 10%; animation-duration: 18s; opacity: 0.15; font-size: 3.5rem; }
+
     @keyframes floatFood {
-      0% { transform: translateX(0) scale(1.1); opacity: 0.13; }
-      100% { transform: translateX(-40px) scale(1.3); opacity: 0.19; }
+      0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+      33% { transform: translate(30px, -40px) rotate(8deg) scale(1.1); }
+      66% { transform: translate(-20px, 30px) rotate(-5deg) scale(0.95); }
+      100% { transform: translate(15px, -15px) rotate(3deg) scale(1.05); }
     }
 
     /* ---------- CARD ---------- */
@@ -151,11 +137,6 @@
     .login-logo img:hover {
       transform: scale(1.02) rotate(-2deg);
       filter: drop-shadow(0 12px 16px rgba(80, 40, 10, 0.25));
-    }
-
-    /* fallback if image missing */
-    .login-logo .logo-fallback {
-      display: none;
     }
 
     h1 {
@@ -285,35 +266,36 @@
         padding: 1.6rem 1.2rem 2rem;
         border-radius: 32px 16px 32px 16px;
       }
-      body::before {
-        font-size: 2.2rem;
-        letter-spacing: 10px;
-      }
-      .food-particle {
-        font-size: 2rem !important;
+      .food-icon {
+        font-size: 2.2rem !important;
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- animated food particles (extra fun) -->
-  <div class="food-particle">🍣</div>
-  <div class="food-particle">🥑</div>
-  <div class="food-particle">🥘</div>
-  <div class="food-particle">🍰</div>
-  <div class="food-particle">🧆</div>
-  <div class="food-particle">🍹</div>
-  <div class="food-particle">🥟</div>
-  <div class="food-particle">🍦</div>
+  <!-- ANIMATED FOOD BACKGROUND (Font Awesome icons from CDN - no emojis) -->
+  <div class="food-bg">
+    <i class="food-icon fa-solid fa-cake-candles"></i>
+    <i class="food-icon fa-solid fa-ice-cream"></i>
+    <i class="food-icon fa-solid fa-cookie"></i>
+    <i class="food-icon fa-solid fa-candy-cane"></i>
+    <i class="food-icon fa-solid fa-mug-saucer"></i>
+    <i class="food-icon fa-solid fa-pizza-slice"></i>
+    <i class="food-icon fa-solid fa-burger"></i>
+    <i class="food-icon fa-solid fa-hotdog"></i>
+    <i class="food-icon fa-solid fa-donut"></i>
+    <i class="food-icon fa-solid fa-croissant"></i>
+    <i class="food-icon fa-solid fa-bread"></i>
+    <i class="food-icon fa-solid fa-wine-glass"></i>
+  </div>
 
+  <!-- LOGIN CARD -->
   <div class="login-wrap">
     <form class="card login-card" id="loginForm" autocomplete="off">
       <!-- BIG LOGO with your "logo.jpg" -->
       <div class="login-logo">
         <img src="logo.jpg" alt="The Little Spoon Logo" id="mainLogo" />
-        <!-- fallback (if logo.jpg missing, show spoon) -->
-        <span class="logo-fallback">🥄</span>
       </div>
 
       <h1>The Little Spoon</h1>
@@ -333,15 +315,13 @@
     </form>
   </div>
 
-  <!-- minimal auth logic (kept from original, but improved) -->
+  <!-- AUTH SCRIPT -->
   <script>
     (function() {
       const form = document.getElementById('loginForm');
       const passwordInput = document.getElementById('password');
       const errorText = document.getElementById('errorText');
-      const submitBtn = document.getElementById('submitBtn');
 
-      // clear error on typing
       passwordInput.addEventListener('input', () => {
         errorText.textContent = '';
       });
@@ -355,15 +335,13 @@
           return;
         }
 
-        // hardcoded admin password (demo) — you can change 'admin123' to your own
         const adminPass = 'admin123';
 
         if (password === adminPass) {
           errorText.textContent = '✅ Connexion réussie ! (redirection simulée)';
           errorText.style.color = '#2b6e4a';
-          // simulate redirect (or you can change window.location)
           setTimeout(() => {
-            window.location.href = 'dashboard.html'; // or any page
+            window.location.href = 'dashboard.html';
           }, 900);
         } else {
           errorText.textContent = '❌ Mot de passe incorrect.';
@@ -373,18 +351,18 @@
         }
       });
 
-      // if logo.jpg fails, show fallback spoon (just in case)
+      // Fallback if logo.jpg fails
       const logoImg = document.getElementById('mainLogo');
       logoImg.addEventListener('error', function() {
         this.style.display = 'none';
-        const fallback = document.querySelector('.logo-fallback');
-        if (fallback) {
-          fallback.style.display = 'block';
-          fallback.style.fontSize = '5rem';
-          fallback.style.lineHeight = '1';
-        }
+        const fallback = document.createElement('span');
+        fallback.textContent = '🥄';
+        fallback.style.fontSize = '5rem';
+        fallback.style.lineHeight = '1';
+        this.parentElement.appendChild(fallback);
       });
     })();
   </script>
+  <script src="js/auth.js"></script>
 </body>
 </html>
