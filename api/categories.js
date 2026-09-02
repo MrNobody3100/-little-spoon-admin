@@ -1,4 +1,4 @@
-import { query } from '../lib/db.js';
+import { query } from '../db.js';
 import crypto from 'crypto';
 
 const COOKIE_NAME = 'tls_admin_session';
