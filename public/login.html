@@ -314,55 +314,6 @@
       </button>
     </form>
   </div>
-
-  <!-- AUTH SCRIPT -->
-  <script>
-    (function() {
-      const form = document.getElementById('loginForm');
-      const passwordInput = document.getElementById('password');
-      const errorText = document.getElementById('errorText');
-
-      passwordInput.addEventListener('input', () => {
-        errorText.textContent = '';
-      });
-
-      form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const password = passwordInput.value.trim();
-
-        if (!password) {
-          errorText.textContent = '⚠️ Veuillez entrer le mot de passe.';
-          return;
-        }
-
-        const adminPass = 'admin123';
-
-        if (password === adminPass) {
-          errorText.textContent = '✅ Connexion réussie ! (redirection simulée)';
-          errorText.style.color = '#2b6e4a';
-          setTimeout(() => {
-            window.location.href = 'dashboard.html';
-          }, 900);
-        } else {
-          errorText.textContent = '❌ Mot de passe incorrect.';
-          errorText.style.color = '#b35e3a';
-          passwordInput.value = '';
-          passwordInput.focus();
-        }
-      });
-
-      // Fallback if logo.jpg fails
-      const logoImg = document.getElementById('mainLogo');
-      logoImg.addEventListener('error', function() {
-        this.style.display = 'none';
-        const fallback = document.createElement('span');
-        fallback.textContent = '🥄';
-        fallback.style.fontSize = '5rem';
-        fallback.style.lineHeight = '1';
-        this.parentElement.appendChild(fallback);
-      });
-    })();
-  </script>
   <script src="js/auth.js"></script>
 </body>
 </html>
