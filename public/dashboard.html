@@ -15,7 +15,7 @@
 
     <style>
         /* ============================================================
-           THE LITTLE SPOON — Dashboard (Phosphor icons, grid toggle)
+           THE LITTLE SPOON — Dashboard (Phosphor icons, responsive card layout)
            ============================================================ */
 
         *,
@@ -267,15 +267,13 @@
            MAIN CONTENT
            ============================================================ */
         .main-content {
-      flex: 1;
-      margin-left: 270px;
-      width: calc(100vw - 270px);
-      max-width: none;
-      min-width: 0;
-      padding: 32px 44px 60px;
-      box-sizing: border-box;
-      overflow-x: hidden;
-    }
+            margin-left: 270px;
+            width: calc(100vw - 270px);
+            max-width: none;
+            padding: 32px 44px 60px;
+            transition: margin 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            overflow-x: hidden;
+        }
 
         /* ---------- Header ---------- */
         .page-header {
@@ -475,21 +473,15 @@
             color: var(--text-main);
         }
 
-        /* ---------- Orders container (flex list by default) ---------- */
+        /* ---------- Orders container ---------- */
         .orders-container {
-      width: 100%;
-      min-width: 0;
-      display: block;
-      overflow-x: auto;
-      overflow-y: visible;
-      border: 1px solid var(--border-light);
-      border-radius: 16px;
-      background: var(--surface);
-      box-shadow: var(--shadow-sm);
-    }
-
-        /* Grid view (applied via JS toggle) */
-        
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(360px, 100%), 1fr));
+            gap: 18px;
+            width: 100%;
+            min-width: 0;
+            animation: fadeUp 0.5s ease forwards;
+        }
 
         @keyframes fadeUp {
             from { opacity: 0; transform: translateY(20px); }
@@ -504,9 +496,11 @@
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--border-light);
             display: flex;
-            flex-wrap: wrap;
-            align-items: center;
+            flex-direction: column;
+            align-items: stretch;
             gap: 18px 24px;
+            min-width: 0;
+            width: 100%;
             transition: all var(--transition-bounce);
             position: relative;
             overflow: hidden;
@@ -677,20 +671,26 @@
             gap: 8px;
             flex-wrap: wrap;
             margin-left: auto;
+            width: 100%;
+            padding-top: 4px;
+            border-top: 1px solid var(--border-light);
         }
 
         .action-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
+            min-height: 40px;
+            padding: 0 14px;
+            border-radius: 10px;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
+            gap: 7px;
             background: var(--surface-alt);
             color: var(--text-muted);
-            border: 1px solid transparent;
-            transition: all var(--transition-bounce);
-            font-size: 16px;
+            border: 1px solid var(--border-light);
+            transition: all var(--transition);
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
         }
         .action-btn:hover {
             background: var(--primary-light);
@@ -699,11 +699,7 @@
             border-color: var(--accent-rose);
             box-shadow: 0 4px 12px rgba(120, 84, 96, 0.15);
         }
-        .action-btn:hover i {
-            animation: iconSpin 0.6s ease;
-        }
-        @keyframes iconSpin {
-            0% { transform: rotate(0deg); }
+        
             100% { transform: rotate(180deg); }
         }
         .action-btn:active {
@@ -816,172 +812,7 @@
         /* ============================================================
            RESPONSIVE
            ============================================================ */
-        
-/* ===== Orders table ===== */
-.orders-table {
-  width: 100%;
-  min-width: 900px;
-  border-collapse: separate;
-  border-spacing: 0;
-  table-layout: fixed;
-}
-
-.orders-table th {
-  padding: 15px 18px;
-  background: var(--surface-alt);
-  color: var(--text-muted);
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .08em;
-  text-align: left;
-  border-bottom: 1px solid var(--border-light);
-  white-space: nowrap;
-}
-
-.orders-table td {
-  padding: 15px 18px;
-  color: var(--text-main);
-  font-size: 13px;
-  vertical-align: middle;
-  border-bottom: 1px solid var(--border-light);
-  background: var(--surface);
-}
-
-.orders-table tbody tr:last-child td {
-  border-bottom: 0;
-}
-
-.orders-table tbody tr {
-  transition: background .18s ease;
-}
-
-.orders-table tbody tr:hover td {
-  background: var(--surface-alt);
-}
-
-.order-client {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 0;
-}
-
-.order-thumb {
-  width: 44px;
-  height: 44px;
-  flex: 0 0 44px;
-  border-radius: 10px;
-  object-fit: cover;
-  border: 1px solid var(--border-light);
-}
-
-.order-client-info {
-  min-width: 0;
-}
-
-.order-name {
-  font-weight: 700;
-  margin-bottom: 3px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.order-phone,
-.order-address,
-.order-product,
-.order-date,
-.order-message {
-  color: var(--text-muted);
-  font-size: 12px;
-}
-
-.order-product {
-  color: var(--text-main);
-  font-weight: 600;
-}
-
-.order-message {
-  max-width: 210px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.order-status {
-  white-space: nowrap;
-}
-
-.order-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  white-space: nowrap;
-}
-
-.order-actions .status-btn,
-.order-actions .detail-btn {
-  border: 1px solid var(--border-light);
-  background: var(--surface);
-  color: var(--text-main);
-  min-height: 36px;
-  padding: 0 11px;
-  border-radius: 9px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  cursor: pointer;
-  font: inherit;
-  font-size: 12px;
-  font-weight: 700;
-  transition: .18s ease;
-}
-
-.order-actions .status-btn:hover,
-.order-actions .detail-btn:hover {
-  background: var(--primary-light);
-  border-color: var(--primary-container);
-  transform: translateY(-1px);
-}
-
-.order-actions .status-btn {
-  color: var(--primary);
-}
-
-.order-actions .detail-btn {
-  color: var(--text-muted);
-}
-
-.order-actions .material-symbols-outlined {
-  font-size: 17px;
-}
-
-.empty-state,
-.loading-state {
-  padding: 45px 20px;
-  text-align: center;
-  color: var(--text-muted);
-}
-
-@media (max-width: 900px) {
-  .main-content {
-    width: 100%;
-    margin-left: 0;
-    padding: 24px 18px 40px;
-  }
-
-  .orders-container {
-    border-radius: 12px;
-  }
-
-  .orders-table {
-    min-width: 820px;
-  }
-}
-
-@media (max-width: 1024px) {
+        @media (max-width: 1024px) {
             .main-content { padding: 24px 28px 48px; }
             .stat-card { min-width: 120px; padding: 14px 18px; }
             .stat-card .stat-value { font-size: 26px; }
@@ -1004,6 +835,8 @@
             }
             .main-content {
                 margin-left: 0;
+                width: 100%;
+                max-width: none;
                 padding: 24px 20px 40px;
                 padding-top: 76px;
             }
@@ -1025,9 +858,15 @@
                 flex: 1 1 auto;
             }
             .order-actions {
-                margin-left: 0;
-                justify-content: flex-start;
-            }
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-left: auto;
+            width: 100%;
+            padding-top: 4px;
+            border-top: 1px solid var(--border-light);
+        }
             .order-card .order-info .order-name {
                 font-size: 15px;
             }
@@ -1035,7 +874,7 @@
                 padding: 8px 16px;
                 font-size: 12px;
             }
-            
+            .orders-container { grid-template-columns: 1fr; }
         }
 
         @media (max-width: 480px) {
@@ -1202,8 +1041,7 @@
             </button>
         </div>
 
-        <!-- View toggle -->
-<!-- Orders list -->
+        <!-- Orders -->
         <section id="ordersList" class="orders-container" aria-label="Liste des commandes">
             <div class="loading-state">
                 <div class="spinner" aria-hidden="true"></div>
@@ -1347,54 +1185,6 @@
             }
         }
         window.logout = logout;
-
-        // ============================================================
-        // VIEW TOGGLE (list / grid) — only adds CSS class, no data changes
-        // ============================================================
-        (function() {
-            const toggleBtns = document.querySelectorAll('#viewToggle button');
-            const ordersContainer = document.getElementById('ordersList');
-
-            toggleBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    toggleBtns.forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-
-                    if (this.dataset.view === 'grid') {
-                        ordersContainer.classList.add('grid-view');
-                    } else {
-                        ordersContainer.classList.remove('grid-view');
-                    }
-                });
-            });
-        })();
-
-        // ============================================================
-        // ADD EDIT BUTTON to each order card after they are rendered
-        // We listen to the 'ordersUpdated' event (dispatched by commandes.js)
-        // to know when orders are loaded, then we insert an edit button.
-        // ============================================================
-        document.addEventListener('ordersUpdated', function() {
-            // Give a small delay for the DOM to update
-            setTimeout(function() {
-                const cards = document.querySelectorAll('.order-card');
-                cards.forEach(card => {
-                    // Check if edit button already exists
-                    if (card.querySelector('.action-btn.edit-btn')) return;
-
-                    const actionsDiv = card.querySelector('.order-actions');
-                    if (!actionsDiv) return;
-
-                    // Create edit button
-                    const editBtn = document.createElement('button');
-                    editBtn.className = 'action-btn edit-btn';
-                    editBtn.title = 'Modifier';
-                    editBtn.innerHTML = '<i class="ph ph-pencil"></i>';
-                    editBtn.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        // Placeholder action — can be connected later
-                        showToast('Fonctionnalité d\'édition à venir', 'info');
-                    });
 
                     // Insert before the delete button (if exists) or at the end
                     const deleteBtn = actionsDiv.querySelector('.action-btn.danger');
