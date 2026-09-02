@@ -1,4 +1,4 @@
-import { sql } from '@vercel/postgres';
+import { query } from '../db.js';
 import crypto from 'crypto';
 
 const COOKIE_NAME = 'tls_admin_session';
@@ -22,13 +22,15 @@ function isAuthorized(req) {
 }
 
 export default async function handler(req, res) {
+  res.setHeader('Content-Type', 'application/json');
+
   if (!isAuthorized(req)) {
     return res.status(401).json({ error: 'Non autorisé' });
   }
 
   if (req.method === 'GET') {
     try {
-      const { rows } = await sql`
+      const { rows } = await query(`
         SELECT
           o.id,
           o.customer_name,
@@ -42,10 +44,11 @@ export default async function handler(req, res) {
         FROM orders o
         LEFT JOIN products p ON p.id = o.product_id
         ORDER BY o.created_at DESC
-      `;
+      `);
       return res.status(200).json(rows);
     } catch (err) {
-      return res.status(500).json({ error: 'Erreur serveur' });
+      console.error('❌ GET /api/orders error:', err.message);
+      return res.status(500).json({ error: 'Erreur serveur', details: err.message, code: err.code || null });
     }
   }
 
@@ -60,15 +63,14 @@ export default async function handler(req, res) {
     }
 
     try {
-      const { rowCount } = await sql`
-        UPDATE orders SET status = ${status} WHERE id = ${id}
-      `;
+      const { rowCount } = await query('UPDATE orders SET status = $1 WHERE id = $2', [status, id]);
       if (rowCount === 0) {
         return res.status(404).json({ error: 'Commande introuvable' });
       }
       return res.status(200).json({ success: true });
     } catch (err) {
-      return res.status(500).json({ error: 'Erreur serveur' });
+      console.error('❌ PATCH /api/orders error:', err.message);
+      return res.status(500).json({ error: 'Erreur serveur', details: err.message, code: err.code || null });
     }
   }
 
