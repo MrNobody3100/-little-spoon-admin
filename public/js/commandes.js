@@ -161,13 +161,39 @@ function showDetail(orderId) {
   );
 }
 
-filterRow.addEventListener('click', (e) => {
-  const btn = e.target.closest('.filter-pill');
-  if (!btn) return;
-  filterRow.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
-  btn.classList.add('active');
-  currentFilter = btn.dataset.status;
-  renderOrders();
-});
+/* =========================
+   FILTERS
+========================= */
+
+if (filterRow) {
+
+  filterRow.addEventListener('click', (e) => {
+
+    const btn = e.target.closest('.filter-pill');
+
+    if (!btn) return;
+
+    filterRow
+      .querySelectorAll('.filter-pill')
+      .forEach(p => {
+        p.classList.remove('active');
+      });
+
+    btn.classList.add('active');
+
+    currentFilter = btn.dataset.status;
+
+    renderOrders();
+
+  });
+
+}
+
+
+/* =========================
+   START
+========================= */
+
+loadOrders();
 
 loadOrders();
