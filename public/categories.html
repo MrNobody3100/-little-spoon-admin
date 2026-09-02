@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>The Little Spoon — Catégories</title>
 
-    <!-- Font Awesome 6 (Free) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <!-- Phosphor Icons -->
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css" />
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -184,19 +186,32 @@
             position: relative;
         }
         .nav-link i {
-            width: 22px;
-            font-size: 18px;
-            text-align: center;
+            width: 34px;
+            height: 34px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: var(--surface-alt);
             flex-shrink: 0;
+            transition: all var(--transition);
         }
         .nav-link:hover {
             background: var(--surface-alt);
             color: var(--text-main);
         }
+        .nav-link:hover i {
+            background: var(--primary-light);
+        }
         .nav-link.active {
             background: var(--primary-container);
             color: var(--primary);
             font-weight: 600;
+        }
+        .nav-link.active i {
+            background: var(--surface);
+            color: var(--primary);
         }
         .nav-link.active::before {
             content: '';
@@ -586,9 +601,33 @@
         }
         .empty-state i {
             font-size: 40px;
-            color: var(--border-light);
+            color: var(--secondary);
             margin-bottom: 12px;
             display: block;
+        }
+
+        /* ---------- Category image placeholder ---------- */
+        .cat-img-placeholder {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: var(--surface-alt);
+            border: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+
+        /* ---------- Spin animation for loading icons ---------- */
+        @keyframes icon-spin {
+            to { transform: rotate(360deg); }
+        }
+        .spin-icon {
+            display: inline-block;
+            animation: icon-spin 0.8s linear infinite;
         }
         .empty-state p {
             font-size: 15px;
@@ -770,26 +809,26 @@
 
         <div class="nav-list">
             <a href="dashboard.html" class="nav-link">
-                <i class="fa-solid fa-gauge-high"></i>
+                <i class="ph-fill ph-gauge"></i>
                 <span>Commandes</span>
             </a>
             <a href="produits.html" class="nav-link">
-                <i class="fa-solid fa-cake-slice"></i>
+                <i class="ph-fill ph-cake"></i>
                 <span>Produits</span>
             </a>
             <a href="categories.html" class="nav-link active">
-                <i class="fa-solid fa-tags"></i>
+                <i class="ph-fill ph-tag"></i>
                 <span>Catégories</span>
             </a>
         </div>
 
         <div class="sidebar-footer">
             <a href="#" class="nav-link" style="color:var(--primary);" onclick="document.getElementById('categoryName').focus(); return false;">
-                <i class="fa-solid fa-plus-circle"></i>
+                <i class="ph-fill ph-plus-circle"></i>
                 <span>Nouvelle catégorie</span>
             </a>
             <a href="#" class="nav-link logout" onclick="logout(); return false;">
-                <i class="fa-solid fa-right-from-bracket"></i>
+                <i class="ph-fill ph-sign-out"></i>
                 <span>Déconnexion</span>
             </a>
         </div>
@@ -799,7 +838,7 @@
     MOBILE TOGGLE
     ============================================================ -->
     <button class="sidebar-toggle" id="sidebarToggle" aria-label="Ouvrir le menu" aria-expanded="false">
-        <i class="fa-solid fa-bars"></i>
+        <i class="ph-bold ph-list"></i>
     </button>
 
     <!-- ============================================================
@@ -838,11 +877,11 @@
                     <div class="form-group">
                         <label>Image (optionnel)</label>
                         <div class="image-upload-mini" id="imageUploadMini">
-                            <i class="fa-regular fa-image upload-icon"></i>
+                            <i class="ph ph-image upload-icon"></i>
                             <span class="upload-text">Télécharger une image</span>
                             <img class="upload-preview" id="categoryImagePreview" alt="Aperçu" />
                             <button type="button" class="remove-image-btn" id="removeCategoryImage" title="Supprimer">
-                                <i class="fa-solid fa-xmark"></i>
+                                <i class="ph-bold ph-x"></i>
                             </button>
                             <input type="file" id="categoryImageInput" accept="image/*" style="display:none;" />
                         </div>
@@ -851,7 +890,7 @@
                     </div>
 
                     <button type="submit" class="btn-save" id="saveCategoryBtn">
-                        <i class="fa-regular fa-floppy-disk"></i> Enregistrer
+                        <i class="ph ph-floppy-disk"></i> Enregistrer
                     </button>
                 </form>
             </section>
@@ -879,7 +918,7 @@
     TOAST
     ============================================================ -->
     <div class="toast" id="toast" role="alert" aria-live="polite">
-        <i class="fa-regular fa-circle-check" aria-hidden="true"></i>
+        <i class="ph ph-check-circle" aria-hidden="true"></i>
         <span id="toastText">Catégorie créée avec succès</span>
     </div>
 
@@ -901,7 +940,7 @@
                 sidebar.classList.add('open');
                 overlay.classList.add('show');
                 toggleBtn.setAttribute('aria-expanded', 'true');
-                toggleBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+                toggleBtn.innerHTML = '<i class="ph-bold ph-x"></i>';
                 document.body.style.overflow = 'hidden';
             }
 
@@ -909,7 +948,7 @@
                 sidebar.classList.remove('open');
                 overlay.classList.remove('show');
                 toggleBtn.setAttribute('aria-expanded', 'false');
-                toggleBtn.innerHTML = '<i class="fa-solid fa-bars"></i>';
+                toggleBtn.innerHTML = '<i class="ph-bold ph-list"></i>';
                 document.body.style.overflow = '';
             }
 
@@ -957,13 +996,13 @@
             text.textContent = message;
 
             if (type === 'success') {
-                icon.className = 'fa-regular fa-circle-check';
+                icon.className = 'ph ph-check-circle';
                 toast.className = 'toast success';
             } else if (type === 'error') {
-                icon.className = 'fa-regular fa-circle-xmark';
+                icon.className = 'ph ph-x-circle';
                 toast.className = 'toast error';
             } else {
-                icon.className = 'fa-regular fa-circle-info';
+                icon.className = 'ph ph-info';
                 toast.className = 'toast';
             }
 
@@ -1127,7 +1166,7 @@ const categories = result;
             } catch (err) {
                 container.innerHTML = `
                     <div class="empty-state">
-                        <i class="fa-regular fa-circle-exclamation"></i>
+                        <i class="ph ph-warning-circle"></i>
                         <p>Impossible de charger les catégories.</p>
                         <p style="font-size:13px;color:var(--text-light);">${err.message}</p>
                     </div>
@@ -1156,7 +1195,7 @@ const categories = result;
             if (!categories || categories.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
-                        <i class="fa-regular fa-tags"></i>
+                        <i class="ph ph-tag"></i>
                         <p>Aucune catégorie.</p>
                         <p style="font-size:13px;color:var(--text-light);">Créez votre première catégorie !</p>
                     </div>
@@ -1172,7 +1211,7 @@ const categories = result;
                 const productCount = counts[cat.id] || 0;
                 const imageHtml = cat.image_url ?
                     `<img src="${cat.image_url}" style="width:36px;height:36px;border-radius:8px;object-fit:cover;flex-shrink:0;" />` :
-                    '';
+                    `<div class="cat-img-placeholder"><i class="ph ph-image"></i></div>`;
 
                 html += `
                     <div class="category-item">
@@ -1185,11 +1224,11 @@ const categories = result;
                         </div>
                         <div class="cat-meta">
                             <span class="cat-product-count">
-                                <i class="fa-regular fa-box"></i> ${productCount} produit${productCount > 1 ? 's' : ''}
+                                <i class="ph ph-package"></i> ${productCount} produit${productCount > 1 ? 's' : ''}
                             </span>
                             <div class="cat-actions">
                                 <button onclick="deleteCategory('${cat.id}')" class="delete" title="Supprimer">
-                                    <i class="fa-regular fa-trash-can"></i>
+                                    <i class="ph ph-trash"></i>
                                 </button>
                             </div>
                         </div>
@@ -1265,7 +1304,7 @@ const categories = result;
             }
 
             saveBtn.disabled = true;
-            saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enregistrement…';
+            saveBtn.innerHTML = '<i class="ph-bold ph-spinner-gap spin-icon"></i> Enregistrement…';
 
             try {
                 const payload = {
@@ -1304,7 +1343,7 @@ const categories = result;
                 showToast('Erreur : ' + err.message, 'error');
             } finally {
                 saveBtn.disabled = false;
-                saveBtn.innerHTML = '<i class="fa-regular fa-floppy-disk"></i> Enregistrer';
+                saveBtn.innerHTML = '<i class="ph ph-floppy-disk"></i> Enregistrer';
             }
         });
 
