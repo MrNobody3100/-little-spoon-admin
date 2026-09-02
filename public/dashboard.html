@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>The Little Spoon — Admin</title>
 
-    <!-- Phosphor Icons -->
+    <!-- Phosphor Icons (same as categories.html) -->
     <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
     <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css" />
     <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
@@ -15,9 +15,7 @@
 
     <style>
         /* ============================================================
-           THE LITTLE SPOON — Dashboard v3
-           Colors & style aligned with categories.html
-           Table + Grid view with image support
+           THE LITTLE SPOON — Dashboard (Phosphor icons, grid toggle)
            ============================================================ */
 
         *,
@@ -72,53 +70,22 @@
         }
 
         @keyframes pageFade {
-            from {
-                opacity: 0;
-                transform: scale(0.98);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
         }
 
-        a {
-            color: inherit;
-            text-decoration: none;
-        }
-        button {
-            font-family: inherit;
-            cursor: pointer;
-            border: none;
-            background: none;
-            font-size: inherit;
-        }
-        input,
-        select,
-        textarea {
-            font-family: inherit;
-            font-size: 16px;
-        }
+        a { color: inherit; text-decoration: none; }
+        button { font-family: inherit; cursor: pointer; border: none; background: none; font-size: inherit; }
+        input, select, textarea { font-family: inherit; font-size: 16px; }
 
         /* ---------- Scrollbar ---------- */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: var(--border-light);
-            border-radius: var(--radius-full);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--secondary);
-            border-radius: var(--radius-full);
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--primary);
-        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--border-light); border-radius: var(--radius-full); }
+        ::-webkit-scrollbar-thumb { background: var(--secondary); border-radius: var(--radius-full); }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
         /* ============================================================
-           SIDEBAR — exactly like categories.html
+           SIDEBAR (exactly like categories.html)
            ============================================================ */
         .sidebar {
             width: 270px;
@@ -337,12 +304,8 @@
             animation: spinSlow 6s linear infinite;
         }
         @keyframes spinSlow {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .stat-group {
@@ -401,12 +364,8 @@
             animation: pulseGlow 2s infinite alternate;
         }
         @keyframes pulseGlow {
-            0% {
-                text-shadow: 0 0 0 rgba(120, 84, 96, 0);
-            }
-            100% {
-                text-shadow: 0 0 12px rgba(120, 84, 96, 0.15);
-            }
+            0% { text-shadow: 0 0 0 rgba(120, 84, 96, 0); }
+            100% { text-shadow: 0 0 12px rgba(120, 84, 96, 0.15); }
         }
         .stat-card .stat-value .stat-icon {
             font-size: 20px;
@@ -414,7 +373,6 @@
             margin-right: 6px;
             opacity: 0.7;
         }
-
         .stat-card.today .stat-value {
             color: var(--secondary);
         }
@@ -422,15 +380,13 @@
             color: var(--secondary);
         }
 
-        /* ---------- Filter pills (Phosphor icons) ---------- */
+        /* ---------- Filter pills (Phosphor) ---------- */
         .filter-bar {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
             margin-bottom: 28px;
             padding-bottom: 4px;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
         }
 
         .filter-pill {
@@ -518,7 +474,7 @@
             color: var(--text-main);
         }
 
-        /* ---------- Orders container ---------- */
+        /* ---------- Orders container (flex list by default) ---------- */
         .orders-container {
             display: flex;
             flex-direction: column;
@@ -526,104 +482,156 @@
             animation: fadeUp 0.5s ease forwards;
         }
 
-        @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        /* Grid view (applied via JS toggle) */
+        .orders-container.grid-view {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
         }
 
-        /* ----- TABLE VIEW (default) ----- */
-        .orders-table-wrap {
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ---------- Order card ---------- */
+        .order-card {
             background: var(--surface);
             border-radius: var(--radius-md);
-            border: 1px solid var(--border-light);
-            overflow-x: auto;
+            padding: 20px 24px;
             box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 18px 24px;
+            transition: all var(--transition-bounce);
+            position: relative;
+            overflow: hidden;
+            animation: cardSlide 0.4s ease forwards;
+            opacity: 0;
         }
-        .orders-table-wrap.hide {
-            display: none;
+        .order-card:nth-child(1) { animation-delay: 0.05s; }
+        .order-card:nth-child(2) { animation-delay: 0.10s; }
+        .order-card:nth-child(3) { animation-delay: 0.15s; }
+        .order-card:nth-child(4) { animation-delay: 0.20s; }
+        .order-card:nth-child(5) { animation-delay: 0.25s; }
+
+        @keyframes cardSlide {
+            0% { opacity: 0; transform: translateX(-10px); }
+            100% { opacity: 1; transform: translateX(0); }
         }
 
-        .orders-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-            min-width: 700px;
+        .order-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 4px;
+            border-radius: 0 4px 4px 0;
+            opacity: 0;
+            transition: opacity var(--transition);
         }
-        .orders-table th {
-            background: var(--surface-alt);
-            padding: 14px 18px;
-            text-align: left;
-            font-weight: 600;
-            color: var(--text-muted);
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            white-space: nowrap;
+        .order-card.status-new::before { background: #e74c3c; opacity: 1; }
+        .order-card.status-confirmed::before { background: #f39c12; opacity: 1; }
+        .order-card.status-ready::before { background: #3498db; opacity: 1; }
+        .order-card.status-delivered::before { background: #27ae60; opacity: 1; }
+
+        .order-card:hover {
+            transform: translateY(-4px) scale(1.01);
+            box-shadow: var(--shadow-md);
+            border-color: var(--accent-rose);
         }
-        .orders-table td {
-            padding: 14px 18px;
-            border-top: 1px solid var(--border-light);
-            vertical-align: middle;
+
+        .order-card .order-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex: 1 1 200px;
+            min-width: 0;
         }
-        .orders-table .order-thumb {
-            width: 48px;
-            height: 48px;
+
+        .order-card .order-thumb {
+            width: 56px;
+            height: 56px;
             border-radius: var(--radius-sm);
-            object-fit: cover;
-            background: var(--primary-container);
-            display: block;
-        }
-        .orders-table .order-thumb-placeholder {
-            width: 48px;
-            height: 48px;
-            border-radius: var(--radius-sm);
-            background: var(--surface-alt);
+            background: var(--primary-light);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--text-light);
-            font-size: 20px;
+            font-size: 24px;
+            color: var(--primary);
+            flex-shrink: 0;
+            transition: all var(--transition-bounce);
         }
-        .orders-table .order-name {
+        .order-card:hover .order-thumb {
+            transform: scale(1.08) rotate(-4deg);
+            background: var(--accent-rose);
+        }
+
+        .order-card .order-info {
+            min-width: 0;
+        }
+        .order-card .order-info .order-name {
             font-weight: 600;
+            font-size: 16px;
             color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
         }
-        .orders-table .order-meta {
+        .order-card .order-info .order-name .order-id {
+            font-weight: 400;
+            font-size: 12px;
+            color: var(--text-light);
+            font-family: 'Inter', monospace;
+            background: var(--surface-alt);
+            padding: 2px 10px;
+            border-radius: var(--radius-full);
+        }
+        .order-card .order-info .order-meta {
             font-size: 13px;
             color: var(--text-muted);
             display: flex;
-            flex-direction: column;
-            gap: 2px;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-top: 3px;
         }
-        .orders-table .order-meta span {
+        .order-card .order-info .order-meta span {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 5px;
         }
-        .orders-table .order-meta i {
-            font-size: 14px;
+        .order-card .order-info .order-meta i {
+            font-size: 13px;
+            opacity: 0.6;
+            transition: all var(--transition);
+        }
+        .order-card:hover .order-info .order-meta i {
+            opacity: 1;
+            color: var(--primary);
         }
 
+        /* Status chip */
         .status-chip {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            padding: 4px 14px;
+            padding: 5px 16px;
             border-radius: var(--radius-full);
             font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.06em;
             white-space: nowrap;
+            transition: all var(--transition);
         }
         .status-chip i {
-            font-size: 14px;
+            font-size: 12px;
+            animation: none;
         }
         .status-chip.new {
             background: #fde8e8;
@@ -656,150 +664,69 @@
         }
 
         @keyframes pulseDot {
-            0%,
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-            50% {
-                transform: scale(1.4);
-                opacity: 0.6;
-            }
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.4); opacity: 0.6; }
         }
 
-        /* ----- Order actions with Edit button ----- */
-        .action-cell {
+        /* Order actions */
+        .order-actions {
             display: flex;
-            gap: 6px;
-            justify-content: flex-end;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-left: auto;
         }
-        .action-cell button {
-            width: 36px;
-            height: 36px;
+
+        .action-btn {
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: transparent;
+            background: var(--surface-alt);
             color: var(--text-muted);
-            transition: all var(--transition);
             border: 1px solid transparent;
-        }
-        .action-cell button:hover {
-            background: var(--surface-alt);
-            color: var(--primary);
-        }
-        .action-cell button.edit:hover {
-            background: var(--primary-light);
-            color: var(--primary);
-        }
-        .action-cell button.delete:hover {
-            background: #fde8e8;
-            color: #c0392b;
-        }
-        .action-cell button i {
-            font-size: 16px;
-        }
-
-        /* ----- GRID VIEW ----- */
-        .orders-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 20px;
-            display: none;
-        }
-        .orders-grid.show {
-            display: grid;
-        }
-        .orders-table-wrap.hide {
-            display: none;
-        }
-
-        .order-grid-card {
-            background: var(--surface);
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border-light);
-            box-shadow: var(--shadow-sm);
-            overflow: hidden;
             transition: all var(--transition-bounce);
-        }
-        .order-grid-card:hover {
-            transform: translateY(-6px);
-            box-shadow: var(--shadow-md);
-            border-color: var(--accent-rose);
-        }
-        .order-grid-card .grid-img {
-            width: 100%;
-            aspect-ratio: 1 / 1;
-            object-fit: cover;
-            background: var(--primary-container);
-        }
-        .order-grid-card .grid-img-placeholder {
-            width: 100%;
-            aspect-ratio: 1 / 1;
-            background: var(--surface-alt);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-light);
-            font-size: 48px;
-        }
-        .order-grid-card .grid-body {
-            padding: 16px;
-        }
-        .order-grid-card .grid-body .order-name {
-            font-weight: 600;
             font-size: 16px;
-            color: var(--text-main);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
-        .order-grid-card .grid-body .order-meta {
-            font-size: 13px;
-            color: var(--text-muted);
-            margin-top: 6px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-        .order-grid-card .grid-body .order-meta span {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .order-grid-card .grid-body .order-actions {
-            margin-top: 12px;
-            display: flex;
-            gap: 8px;
-            justify-content: flex-end;
-        }
-        .order-grid-card .grid-body .order-actions button {
-            padding: 6px 14px;
-            border-radius: var(--radius-full);
-            font-size: 12px;
-            font-weight: 600;
-            background: var(--surface-alt);
-            color: var(--text-muted);
-            transition: all var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .order-grid-card .grid-body .order-actions button:hover {
+        .action-btn:hover {
             background: var(--primary-light);
             color: var(--primary);
+            transform: scale(1.12) rotate(6deg);
+            border-color: var(--accent-rose);
+            box-shadow: 0 4px 12px rgba(120, 84, 96, 0.15);
         }
-        .order-grid-card .grid-body .order-actions button.edit:hover {
-            background: var(--primary-container);
-            color: var(--primary);
+        .action-btn:hover i {
+            animation: iconSpin 0.6s ease;
         }
-        .order-grid-card .grid-body .order-actions button.delete:hover {
+        @keyframes iconSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(180deg); }
+        }
+        .action-btn:active {
+            transform: scale(0.92);
+        }
+        .action-btn.primary-action {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(120, 84, 96, 0.25);
+        }
+        .action-btn.primary-action:hover {
+            background: var(--primary-dark);
+            box-shadow: 0 6px 20px rgba(120, 84, 96, 0.35);
+            transform: scale(1.12);
+        }
+        .action-btn.primary-action:active {
+            transform: scale(0.92);
+        }
+        .action-btn.danger:hover {
             background: #fde8e8;
             color: #c0392b;
+            border-color: #f5c6c6;
         }
 
-        /* ---------- Empty state ---------- */
+        /* ---------- Empty / loading states ---------- */
         .empty-state {
             text-align: center;
             padding: 72px 32px;
@@ -810,9 +737,10 @@
         }
         .empty-state i {
             font-size: 56px;
-            color: var(--secondary);
+            color: var(--border-light);
             margin-bottom: 20px;
             display: block;
+            animation: float 3s ease-in-out infinite;
         }
         .empty-state h3 {
             font-family: 'Playfair Display', serif;
@@ -842,9 +770,7 @@
             margin-bottom: 16px;
         }
         @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+            to { transform: rotate(360deg); }
         }
 
         /* ---------- Toast ---------- */
@@ -889,16 +815,9 @@
            RESPONSIVE
            ============================================================ */
         @media (max-width: 1024px) {
-            .main-content {
-                padding: 24px 28px 48px;
-            }
-            .stat-card {
-                min-width: 120px;
-                padding: 14px 18px;
-            }
-            .stat-card .stat-value {
-                font-size: 26px;
-            }
+            .main-content { padding: 24px 28px 48px; }
+            .stat-card { min-width: 120px; padding: 14px 18px; }
+            .stat-card .stat-value { font-size: 26px; }
         }
 
         @media (max-width: 820px) {
@@ -929,11 +848,28 @@
             .stat-group {
                 justify-content: flex-start;
             }
-            .view-toggle {
-                margin-bottom: 16px;
+            .order-card {
+                padding: 16px 18px;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 14px;
             }
-            .orders-grid {
-                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            .order-card .order-left {
+                flex: 1 1 auto;
+            }
+            .order-actions {
+                margin-left: 0;
+                justify-content: flex-start;
+            }
+            .order-card .order-info .order-name {
+                font-size: 15px;
+            }
+            .filter-pill {
+                padding: 8px 16px;
+                font-size: 12px;
+            }
+            .orders-container.grid-view {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -960,8 +896,10 @@
             .page-header-left h2 {
                 font-size: 28px;
             }
-            .orders-grid {
-                grid-template-columns: 1fr;
+            .order-card .order-thumb {
+                width: 44px;
+                height: 44px;
+                font-size: 18px;
             }
             .toast {
                 bottom: 16px;
@@ -970,6 +908,22 @@
                 width: calc(100% - 32px);
                 justify-content: center;
             }
+        }
+
+        /* ---------- Utilities ---------- */
+        .fade-in { animation: fadeUp 0.4s ease forwards; }
+        .fade-in-d1 { animation-delay: 0.05s; }
+        .fade-in-d2 { animation-delay: 0.10s; }
+        .fade-in-d3 { animation-delay: 0.15s; }
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
         }
     </style>
 </head>
@@ -1038,20 +992,20 @@
                 <p><i class="ph ph-clock" style="margin-right:6px;opacity:0.6;"></i>Gérez les douceurs du jour</p>
             </div>
             <div class="stat-group">
-                <div class="stat-card today">
+                <div class="stat-card today fade-in fade-in-d1">
                     <div class="stat-label">
                         <i class="ph ph-calendar-plus" style="margin-right:4px;"></i> Aujourd'hui
                     </div>
-                    <div class="stat-value">
+                    <div class="stat-value" id="statNew">
                         <span class="stat-icon" aria-hidden="true"><i class="ph ph-clock"></i></span>
                         <span id="statNewNumber">—</span>
                     </div>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card fade-in fade-in-d2">
                     <div class="stat-label">
                         <i class="ph ph-list" style="margin-right:4px;"></i> Total
                     </div>
-                    <div class="stat-value">
+                    <div class="stat-value" id="statTotal">
                         <span class="stat-icon" aria-hidden="true"><i class="ph ph-list"></i></span>
                         <span id="statTotalNumber">—</span>
                     </div>
@@ -1085,8 +1039,8 @@
 
         <!-- View toggle -->
         <div class="view-toggle" id="viewToggle">
-            <button class="active" data-view="table" title="Vue tableau">
-                <i class="ph-bold ph-table"></i> Tableau
+            <button class="active" data-view="list" title="Vue liste">
+                <i class="ph-bold ph-list"></i> Liste
             </button>
             <button data-view="grid" title="Vue grille">
                 <i class="ph-bold ph-grid-four"></i> Grille
@@ -1094,19 +1048,10 @@
         </div>
 
         <!-- Orders list -->
-        <section id="ordersList" aria-label="Liste des commandes">
-            <!-- Table view (default) -->
-            <div class="orders-table-wrap" id="ordersTableWrap">
-                <div id="ordersTableContainer">
-                    <div class="loading-state">
-                        <div class="spinner" aria-hidden="true"></div>
-                        <p>Chargement des commandes…</p>
-                    </div>
-                </div>
-            </div>
-            <!-- Grid view (hidden) -->
-            <div class="orders-grid" id="ordersGridContainer">
-                <!-- populated by JS -->
+        <section id="ordersList" class="orders-container" aria-label="Liste des commandes">
+            <div class="loading-state">
+                <div class="spinner" aria-hidden="true"></div>
+                <p>Chargement des commandes…</p>
             </div>
         </section>
 
@@ -1128,7 +1073,7 @@
 
     <script>
         // ============================================================
-        // SIDEBAR TOGGLE (mobile) — untouched
+        // SIDEBAR TOGGLE (mobile) — unchanged
         // ============================================================
         (function() {
             const sidebar = document.getElementById('sidebar');
@@ -1184,33 +1129,11 @@
         })();
 
         // ============================================================
-        // VIEW TOGGLE (Table / Grid) — CSS only, no logic change
-        // ============================================================
-        (function() {
-            const toggleBtns = document.querySelectorAll('#viewToggle button');
-            const tableWrap = document.getElementById('ordersTableWrap');
-            const gridContainer = document.getElementById('ordersGridContainer');
-
-            toggleBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    toggleBtns.forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-
-                    if (this.dataset.view === 'table') {
-                        tableWrap.classList.remove('hide');
-                        gridContainer.classList.remove('show');
-                    } else {
-                        tableWrap.classList.add('hide');
-                        gridContainer.classList.add('show');
-                    }
-                });
-            });
-        })();
-
-        // ============================================================
-        // FILTER PILLS — sync with commandes.js (unchanged)
+        // FILTER PILLS — sync with commandes.js (original event listeners)
         // ============================================================
         document.addEventListener('DOMContentLoaded', function() {
+            const pills = document.querySelectorAll('.filter-pill');
+
             document.addEventListener('ordersUpdated', function(e) {
                 const counts = e.detail.counts || {};
                 document.getElementById('countAll').textContent = counts.all || 0;
@@ -1222,14 +1145,13 @@
 
             document.addEventListener('statsUpdated', function(e) {
                 const stats = e.detail || {};
-                document.getElementById('statNewNumber').textContent = stats.newToday !== undefined ? stats.newToday :
-                    '—';
+                document.getElementById('statNewNumber').textContent = stats.newToday !== undefined ? stats.newToday : '—';
                 document.getElementById('statTotalNumber').textContent = stats.total !== undefined ? stats.total : '—';
             });
         });
 
         // ============================================================
-        // TOAST helper (unchanged)
+        // TOAST helper (used by commandes.js) — unchanged
         // ============================================================
         function showToast(message, type) {
             type = type || 'success';
@@ -1259,7 +1181,7 @@
         window.showToast = showToast;
 
         // ============================================================
-        // LOGOUT (unchanged)
+        // LOGOUT — unchanged
         // ============================================================
         function logout() {
             if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
@@ -1271,122 +1193,63 @@
         window.logout = logout;
 
         // ============================================================
-        // GRID VIEW RENDER — listens for ordersRendered event from commandes.js
+        // VIEW TOGGLE (list / grid) — only adds CSS class, no data changes
         // ============================================================
-        document.addEventListener('ordersRendered', function(e) {
-            const orders = e.detail.orders;
-            if (!orders || orders.length === 0) {
-                document.getElementById('ordersGridContainer').innerHTML = `
-                    <div class="empty-state" style="grid-column:1/-1;">
-                        <i class="ph ph-list"></i>
-                        <h3>Aucune commande</h3>
-                        <p>Les commandes apparaîtront ici.</p>
-                    </div>
-                `;
-                return;
-            }
-            renderGrid(orders);
-        });
+        (function() {
+            const toggleBtns = document.querySelectorAll('#viewToggle button');
+            const ordersContainer = document.getElementById('ordersList');
 
-        function renderGrid(orders) {
-            const container = document.getElementById('ordersGridContainer');
-            let html = '';
-            orders.forEach(order => {
-                const statusClass = order.status || 'nouvelle';
-                const statusLabel = statusClass.charAt(0).toUpperCase() + statusClass.slice(1);
-                const imageUrl = order.image_url || '';
-                const name = order.product_name || order.name || 'Commande';
-                const total = order.total || order.price || 0;
-                const date = order.created_at ? new Date(order.created_at).toLocaleDateString('fr-FR') : '';
+            toggleBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    toggleBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
 
-                html += `
-                    <div class="order-grid-card">
-                        ${imageUrl ? `<img src="${imageUrl}" alt="${name}" class="grid-img" />` : 
-                            `<div class="grid-img-placeholder"><i class="ph ph-image"></i></div>`}
-                        <div class="grid-body">
-                            <div class="order-name">
-                                <span>${escapeHtml(name)}</span>
-                                <span class="status-chip ${statusClass}"><i class="ph ph-circle-fill"></i>${statusLabel}</span>
-                            </div>
-                            <div class="order-meta">
-                                <span><i class="ph ph-currency-dzd"></i> ${total} DA</span>
-                                ${date ? `<span><i class="ph ph-calendar"></i> ${date}</span>` : ''}
-                                <span><i class="ph ph-user"></i> ${escapeHtml(order.customer_name || 'Client')}</span>
-                            </div>
-                            <div class="order-actions">
-                                <button class="edit" onclick="editOrder('${order.id}')" title="Modifier">
-                                    <i class="ph ph-pencil"></i> Modifier
-                                </button>
-                                <button class="delete" onclick="deleteOrder('${order.id}')" title="Supprimer">
-                                    <i class="ph ph-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
+                    if (this.dataset.view === 'grid') {
+                        ordersContainer.classList.add('grid-view');
+                    } else {
+                        ordersContainer.classList.remove('grid-view');
+                    }
+                });
             });
-            container.innerHTML = html;
-        }
-
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
+        })();
 
         // ============================================================
-        // EDIT & DELETE placeholders — just the icon, no logic yet
+        // ADD EDIT BUTTON to each order card after they are rendered
+        // We listen to the 'ordersUpdated' event (dispatched by commandes.js)
+        // to know when orders are loaded, then we insert an edit button.
         // ============================================================
-        function editOrder(id) {
-            showToast('Fonctionnalité d\'édition à venir', 'info');
-        }
-        window.editOrder = editOrder;
+        document.addEventListener('ordersUpdated', function() {
+            // Give a small delay for the DOM to update
+            setTimeout(function() {
+                const cards = document.querySelectorAll('.order-card');
+                cards.forEach(card => {
+                    // Check if edit button already exists
+                    if (card.querySelector('.action-btn.edit-btn')) return;
 
-        function deleteOrder(id) {
-            if (!confirm('Supprimer cette commande ?')) return;
-            showToast('Suppression à implémenter', 'error');
-        }
-        window.deleteOrder = deleteOrder;
+                    const actionsDiv = card.querySelector('.order-actions');
+                    if (!actionsDiv) return;
 
-        // ============================================================
-        // Add edit buttons to existing table rows (after commandes.js renders)
-        // ============================================================
-        function addEditButtonsToTable() {
-            const rows = document.querySelectorAll('#ordersTableContainer .order-row, #ordersTableContainer tr');
-            rows.forEach(row => {
-                const actionCell = row.querySelector('.action-cell');
-                if (actionCell && !actionCell.querySelector('.edit')) {
+                    // Create edit button
                     const editBtn = document.createElement('button');
-                    editBtn.className = 'edit';
+                    editBtn.className = 'action-btn edit-btn';
                     editBtn.title = 'Modifier';
                     editBtn.innerHTML = '<i class="ph ph-pencil"></i>';
-                    editBtn.onclick = function() {
-                        const id = row.dataset.orderId || 'unknown';
-                        editOrder(id);
-                    };
-                    // Insert before delete button
-                    const deleteBtn = actionCell.querySelector('.delete');
+                    editBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        // Placeholder action — can be connected later
+                        showToast('Fonctionnalité d\'édition à venir', 'info');
+                    });
+
+                    // Insert before the delete button (if exists) or at the end
+                    const deleteBtn = actionsDiv.querySelector('.action-btn.danger');
                     if (deleteBtn) {
-                        actionCell.insertBefore(editBtn, deleteBtn);
+                        actionsDiv.insertBefore(editBtn, deleteBtn);
                     } else {
-                        actionCell.appendChild(editBtn);
+                        actionsDiv.appendChild(editBtn);
                     }
-                }
-            });
-        }
-
-        // Observe orders container for changes (when commandes.js renders)
-        const observer = new MutationObserver(function() {
-            addEditButtonsToTable();
+                });
+            }, 100);
         });
-        const container = document.getElementById('ordersTableContainer');
-        if (container) {
-            observer.observe(container, { childList: true, subtree: true });
-        }
-
-        // Also run after a short delay on page load
-        setTimeout(addEditButtonsToTable, 500);
     </script>
 
 </body>
