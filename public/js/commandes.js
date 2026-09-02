@@ -20,7 +20,7 @@ let allOrders = [];
 let currentFilter = 'all';
 
 const ordersList = document.getElementById('ordersList');
-const filterRow = document.getElementById('filterRow');
+const filterRow = document.getElementById('filterBar');
 const statNew = document.getElementById('statNew');
 const statTotal = document.getElementById('statTotal');
 const toast = document.getElementById('toast');
