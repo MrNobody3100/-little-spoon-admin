@@ -1,5 +1,5 @@
 // commandes.js — alimente le tableau de commandes de dashboard.html
-
+const a;
 const STATUS_LABELS = {
   nouvelle: 'Nouvelle',
   confirmée: 'Confirmée',
