@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>The Little Spoon — Produits</title>
 
-    <!-- Font Awesome 6 (Free) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <!-- Phosphor Icons -->
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css" />
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -191,10 +193,23 @@
             position: relative;
         }
         .nav-link i {
-            width: 22px;
-            font-size: 18px;
-            text-align: center;
+            width: 34px;
+            height: 34px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: var(--surface-alt);
             flex-shrink: 0;
+            transition: all var(--transition);
+        }
+        .nav-link:hover i {
+            background: var(--primary-light);
+        }
+        .nav-link.active i {
+            background: var(--surface);
+            color: var(--primary);
         }
         .nav-link:hover {
             background: var(--surface-alt);
@@ -586,6 +601,28 @@
         .product-table .product-status.unavailable {
             background: #e74c3c;
         }
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .status-pill.available { color: #1a7a4a; }
+        .status-pill.unavailable { color: #c0392b; }
+        .product-thumb-placeholder {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-sm);
+            background: var(--surface-alt);
+            border: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            font-size: 18px;
+        }
         .product-table .action-cell {
             display: flex;
             gap: 6px;
@@ -803,6 +840,13 @@
                 transform: rotate(360deg);
             }
         }
+        @keyframes icon-spin {
+            to { transform: rotate(360deg); }
+        }
+        .spin-icon {
+            display: inline-block;
+            animation: icon-spin 0.8s linear infinite;
+        }
     </style>
 </head>
 <body>
@@ -826,26 +870,26 @@
 
         <div class="nav-list">
             <a href="dashboard.html" class="nav-link">
-                <i class="fa-solid fa-gauge-high"></i>
+                <i class="ph-fill ph-gauge"></i>
                 <span>Commandes</span>
             </a>
             <a href="produits.html" class="nav-link active">
-                <i class="fa-solid fa-cake-slice"></i>
+                <i class="ph-fill ph-cake"></i>
                 <span>Produits</span>
             </a>
             <a href="categories.html" class="nav-link">
-                <i class="fa-solid fa-tags"></i>
+                <i class="ph-fill ph-tag"></i>
                 <span>Catégories</span>
             </a>
         </div>
 
         <div class="sidebar-footer">
             <a href="produits.html?new=1" class="nav-link" style="color:var(--primary);">
-                <i class="fa-solid fa-plus-circle"></i>
+                <i class="ph-fill ph-plus-circle"></i>
                 <span>Nouveau produit</span>
             </a>
             <a href="#" class="nav-link logout" onclick="logout(); return false;">
-                <i class="fa-solid fa-right-from-bracket"></i>
+                <i class="ph-fill ph-sign-out"></i>
                 <span>Déconnexion</span>
             </a>
         </div>
@@ -855,7 +899,7 @@
     MOBILE TOGGLE
     ============================================================ -->
     <button class="sidebar-toggle" id="sidebarToggle" aria-label="Ouvrir le menu" aria-expanded="false">
-        <i class="fa-solid fa-bars"></i>
+        <i class="ph-bold ph-list"></i>
     </button>
 
     <!-- ============================================================
@@ -873,8 +917,8 @@
         ADD PRODUCT FORM
         ============================================================ -->
         <section class="form-card">
-            <div class="form-title">Create Masterpiece</div>
-            <div class="form-subtitle">Ajoutez une nouvelle création au catalogue de la boutique.</div>
+            <div class="form-title" id="formTitle">Create Masterpiece</div>
+            <div class="form-subtitle" id="formSubtitle">Ajoutez une nouvelle création au catalogue de la boutique.</div>
 
             <form id="productForm" novalidate>
                 <div class="form-grid">
@@ -885,7 +929,7 @@
                             <label>Aperçu Photo (4:5)</label>
                             <div class="preview-box" id="previewBox">
                                 <img id="previewImg" src="" alt="Aperçu" style="display:none;" />
-                                <i class="fa-regular fa-image placeholder-icon" id="placeholderIcon"></i>
+                                <i class="ph ph-image placeholder-icon" id="placeholderIcon"></i>
                             </div>
                         </div>
 
@@ -918,7 +962,7 @@
 
                         <input type="file" id="imageFileInput" accept="image/*" style="display:none;" />
                         <button type="button" class="btn-upload" onclick="document.getElementById('imageFileInput').click();">
-                            <i class="fa-regular fa-upload"></i> Téléverser une image
+                            <i class="ph ph-upload-simple"></i> Téléverser une image
                         </button>
                     </div>
 
@@ -949,9 +993,9 @@
                         </div>
 
                         <div class="form-actions">
-                            <button type="button" class="btn-discard" onclick="window.location.href='dashboard.html'">Annuler</button>
+                            <button type="button" class="btn-discard" onclick="cancelForm()">Annuler</button>
                             <button type="submit" class="btn-publish" id="publishBtn">
-                                <i class="fa-regular fa-paper-plane"></i> Publier
+                                <i class="ph-fill ph-paper-plane-tilt"></i> Publier
                             </button>
                         </div>
                     </div>
@@ -985,7 +1029,7 @@
     TOAST
     ============================================================ -->
     <div class="toast" id="toast" role="alert" aria-live="polite">
-        <i class="fa-regular fa-circle-check" aria-hidden="true"></i>
+        <i class="ph ph-check-circle" aria-hidden="true"></i>
         <span id="toastText">Produit créé avec succès</span>
     </div>
 
@@ -1007,7 +1051,7 @@
                 sidebar.classList.add('open');
                 overlay.classList.add('show');
                 toggleBtn.setAttribute('aria-expanded', 'true');
-                toggleBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+                toggleBtn.innerHTML = '<i class="ph-bold ph-x"></i>';
                 document.body.style.overflow = 'hidden';
             }
 
@@ -1015,7 +1059,7 @@
                 sidebar.classList.remove('open');
                 overlay.classList.remove('show');
                 toggleBtn.setAttribute('aria-expanded', 'false');
-                toggleBtn.innerHTML = '<i class="fa-solid fa-bars"></i>';
+                toggleBtn.innerHTML = '<i class="ph-bold ph-list"></i>';
                 document.body.style.overflow = '';
             }
 
@@ -1063,13 +1107,13 @@
             text.textContent = message;
 
             if (type === 'success') {
-                icon.className = 'fa-regular fa-circle-check';
+                icon.className = 'ph ph-check-circle';
                 toast.className = 'toast success';
             } else if (type === 'error') {
-                icon.className = 'fa-regular fa-circle-xmark';
+                icon.className = 'ph ph-x-circle';
                 toast.className = 'toast error';
             } else {
-                icon.className = 'fa-regular fa-circle-info';
+                icon.className = 'ph ph-info';
                 toast.className = 'toast';
             }
 
@@ -1218,6 +1262,8 @@
         // ============================================================
         // LOAD PRODUCTS
         // ============================================================
+        let allProducts = [];
+
         async function loadProducts() {
             const container = document.getElementById('productListContainer');
 
@@ -1226,11 +1272,12 @@
                 if (!response.ok) throw new Error('Erreur chargement produits');
 
                 const products = await response.json();
+                allProducts = products;
                 renderProductTable(products, container);
             } catch (err) {
                 container.innerHTML = `
                     <div class="empty-state">
-                        <i class="fa-regular fa-circle-exclamation"></i>
+                        <i class="ph ph-warning-circle"></i>
                         <p>Impossible de charger les produits.</p>
                         <p style="font-size:13px;color:var(--text-light);">${err.message}</p>
                     </div>
@@ -1242,7 +1289,7 @@
             if (!products || products.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
-                        <i class="fa-regular fa-box-open"></i>
+                        <i class="ph ph-package"></i>
                         <p>Aucun produit dans le catalogue.</p>
                         <p style="font-size:13px;color:var(--text-light);">Commencez par en créer un !</p>
                     </div>
@@ -1268,24 +1315,32 @@
 
             products.forEach(p => {
                 const statusClass = p.is_available !== false ? 'available' : 'unavailable';
+                const statusLabel = p.is_available !== false ? 'Disponible' : 'Indisponible';
                 const thumb = p.image_url || '';
 
                 html += `
                     <tr>
                         <td>
-                            ${thumb ? `<img src="${thumb}" alt="${escapeHtml(p.name)}" class="product-thumb" />` : '<span style="color:var(--text-light);font-size:20px;"><i class="fa-regular fa-image"></i></span>'}
+                            ${thumb ? `<img src="${thumb}" alt="${escapeHtml(p.name)}" class="product-thumb" />` : '<div class="product-thumb-placeholder"><i class="ph ph-image"></i></div>'}
                         </td>
                         <td class="product-name-cell">${escapeHtml(p.name)}</td>
                         <td><span class="product-category">${escapeHtml(p.category_name || 'Non classé')}</span></td>
                         <td class="product-price">${p.price ? p.price + ' DA' : '—'}</td>
-                        <td><span class="product-status ${statusClass}" title="${p.is_available !== false ? 'Disponible' : 'Indisponible'}"></span></td>
+                        <td>
+                            <span class="status-pill ${statusClass}">
+                                <span class="product-status ${statusClass}"></span> ${statusLabel}
+                            </span>
+                        </td>
                         <td style="text-align:right;">
                             <div class="action-cell">
+                                <button onclick="editProduct('${p.id}')" title="Modifier">
+                                    <i class="ph ph-pencil-simple"></i>
+                                </button>
                                 <button onclick="toggleProductStatus(${p.id}, ${p.is_available !== false ? 'false' : 'true'})" title="Basculer disponibilité">
-                                    <i class="fa-solid ${p.is_available !== false ? 'fa-eye' : 'fa-eye-slash'}"></i>
+                                    <i class="${p.is_available !== false ? 'ph ph-eye' : 'ph ph-eye-slash'}"></i>
                                 </button>
                                 <button onclick="deleteProduct(${p.id})" class="delete" title="Supprimer">
-                                    <i class="fa-regular fa-trash-can"></i>
+                                    <i class="ph ph-trash"></i>
                                 </button>
                             </div>
                         </td>
@@ -1354,6 +1409,54 @@
         // ============================================================
         const form = document.getElementById('productForm');
         const publishBtn = document.getElementById('publishBtn');
+        const formTitle = document.getElementById('formTitle');
+        const formSubtitle = document.getElementById('formSubtitle');
+
+        let editingProductId = null;
+
+        function enterEditMode(product) {
+            editingProductId = product.id;
+
+            document.getElementById('cakeName').value = product.name || '';
+            document.getElementById('cakeDesc').value = product.description || '';
+            document.getElementById('cakePrice').value = product.price || '';
+            document.getElementById('cakeCategory').value = product.category_id || '';
+            imgUrlInput.value = product.image_url || '';
+            updatePreview();
+
+            formTitle.textContent = 'Modifier la création';
+            formSubtitle.textContent = `Vous modifiez « ${product.name} ».`;
+            publishBtn.innerHTML = '<i class="ph-fill ph-check"></i> Enregistrer les modifications';
+
+            document.querySelector('.form-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function editProduct(id) {
+            const product = allProducts.find(p => String(p.id) === String(id));
+            if (!product) return;
+            enterEditMode(product);
+        }
+        window.editProduct = editProduct;
+
+        function resetFormToCreateMode() {
+            editingProductId = null;
+            form.reset();
+            imgUrlInput.value = '';
+            updatePreview();
+            document.getElementById('cakeCategory').value = '';
+            formTitle.textContent = 'Create Masterpiece';
+            formSubtitle.textContent = 'Ajoutez une nouvelle création au catalogue de la boutique.';
+            publishBtn.innerHTML = '<i class="ph-fill ph-paper-plane-tilt"></i> Publier';
+        }
+
+        function cancelForm() {
+            if (editingProductId !== null) {
+                resetFormToCreateMode();
+            } else {
+                window.location.href = 'dashboard.html';
+            }
+        }
+        window.cancelForm = cancelForm;
 
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -1379,20 +1482,33 @@
                 return;
             }
 
+            const isEditing = editingProductId !== null;
+
             publishBtn.disabled = true;
-            publishBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Publication…';
+            publishBtn.innerHTML = isEditing
+                ? '<i class="ph-bold ph-spinner-gap spin-icon"></i> Enregistrement…'
+                : '<i class="ph-bold ph-spinner-gap spin-icon"></i> Publication…';
 
             try {
-                const payload = {
-                    name: name,
-                    description: description || null,
-                    price: parseFloat(price),
-                    imageUrl: imageUrl,
-                    categoryId: categoryId || null
-                };
+                const payload = isEditing
+                    ? {
+                        id: editingProductId,
+                        name: name,
+                        description: description || null,
+                        price: parseFloat(price),
+                        imageUrl: imageUrl,
+                        categoryId: categoryId || null
+                    }
+                    : {
+                        name: name,
+                        description: description || null,
+                        price: parseFloat(price),
+                        imageUrl: imageUrl,
+                        categoryId: categoryId || null
+                    };
 
                 const response = await fetch('/api/produits', {
-                    method: 'POST',
+                    method: isEditing ? 'PUT' : 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
@@ -1400,23 +1516,21 @@
                 const result = await response.json();
 
                 if (!response.ok) {
-                    throw new Error(result.error || 'Erreur création');
+                    throw new Error(result.error || (isEditing ? 'Erreur modification' : 'Erreur création'));
                 }
 
-                showToast('Création publiée avec succès !', 'success');
+                showToast(isEditing ? 'Création modifiée avec succès !' : 'Création publiée avec succès !', 'success');
 
-                form.reset();
-                imgUrlInput.value = '';
-                updatePreview();
-                document.getElementById('cakeCategory').value = '';
-
+                resetFormToCreateMode();
                 loadProducts();
 
             } catch (err) {
                 showToast('Erreur : ' + err.message, 'error');
             } finally {
                 publishBtn.disabled = false;
-                publishBtn.innerHTML = '<i class="fa-regular fa-paper-plane"></i> Publier';
+                if (editingProductId === null) {
+                    publishBtn.innerHTML = '<i class="ph-fill ph-paper-plane-tilt"></i> Publier';
+                }
             }
         });
 
