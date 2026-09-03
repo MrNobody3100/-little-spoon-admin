@@ -1336,10 +1336,10 @@
                                 <button onclick="editProduct('${p.id}')" title="Modifier">
                                     <i class="ph ph-pencil-simple"></i>
                                 </button>
-                                <button onclick="toggleProductStatus(${p.id}, ${p.is_available !== false ? 'false' : 'true'})" title="Basculer disponibilité">
+                                <button onclick="toggleProductStatus('${p.id}', ${p.is_available !== false ? 'false' : 'true'})" title="Basculer disponibilité">
                                     <i class="${p.is_available !== false ? 'ph ph-eye' : 'ph ph-eye-slash'}"></i>
                                 </button>
-                                <button onclick="deleteProduct(${p.id})" class="delete" title="Supprimer">
+                                <button onclick="deleteProduct('${p.id}')" class="delete" title="Supprimer">
                                     <i class="ph ph-trash"></i>
                                 </button>
                             </div>
