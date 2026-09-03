@@ -1,4 +1,4 @@
-// commandes.js — powers dashboard.html (orders list)
+// commandes.js — alimente le tableau de commandes de dashboard.html
 
 const STATUS_LABELS = {
   nouvelle: 'Nouvelle',
@@ -8,29 +8,25 @@ const STATUS_LABELS = {
 };
 
 const STATUS_CHIP_CLASS = {
-  nouvelle: 'chip-new',
-  confirmée: 'chip-confirmed',
-  prête: 'chip-ready',
-  livrée: 'chip-delivered'
+  nouvelle: 'status-new',
+  confirmée: 'status-confirmed',
+  prête: 'status-ready',
+  livrée: 'status-delivered'
 };
 
-const STATUS_FLOW = ['nouvelle', 'confirmée', 'prête', 'livrée'];
+// Icône + libellé du bouton qui fait avancer une commande à l'étape suivante
+const STATUS_NEXT_ACTION = {
+  nouvelle: { next: 'confirmée', icon: 'ph-check', label: 'Confirmer' },
+  confirmée: { next: 'prête', icon: 'ph-package', label: 'Marquer prête' },
+  prête: { next: 'livrée', icon: 'ph-truck', label: 'Marquer livrée' },
+  livrée: null
+};
 
 let allOrders = [];
 let currentFilter = 'all';
 
 const ordersList = document.getElementById('ordersList');
-const filterRow = document.getElementById('filterRow');
-const statNew = document.getElementById('statNew');
-const statTotal = document.getElementById('statTotal');
-const toast = document.getElementById('toast');
-const toastText = document.getElementById('toastText');
-
-function showToast(message) {
-  toastText.textContent = message;
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2500);
-}
+const filterBar = document.getElementById('filterBar');
 
 function formatDate(iso) {
   const d = new Date(iso);
@@ -41,10 +37,10 @@ function formatDate(iso) {
   return `${d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}, ${time}`;
 }
 
-function nextStatus(status) {
-  const idx = STATUS_FLOW.indexOf(status);
-  if (idx === -1 || idx === STATUS_FLOW.length - 1) return null;
-  return STATUS_FLOW[idx + 1];
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str ?? '';
+  return div.innerHTML;
 }
 
 function renderOrders() {
@@ -53,71 +49,115 @@ function renderOrders() {
     : allOrders.filter(o => o.status === currentFilter);
 
   if (filtered.length === 0) {
-    ordersList.innerHTML = `<div class="empty-state">Aucune commande dans cette catégorie pour le moment.</div>`;
+    ordersList.innerHTML = `
+      <div class="empty-state">
+        <i class="ph ph-tray"></i>
+        <h3>Aucune commande ici</h3>
+        <p>${currentFilter === 'all' ? 'Les nouvelles commandes du site client apparaîtront ici.' : 'Aucune commande dans ce statut pour le moment.'}</p>
+      </div>
+    `;
     return;
   }
 
-  ordersList.innerHTML = filtered.map(order => {
-    const statusClass = STATUS_CHIP_CLASS[order.status] || 'chip-new';
+  let rows = filtered.map(order => {
+    const statusClass = STATUS_CHIP_CLASS[order.status] || 'status-new';
     const statusLabel = STATUS_LABELS[order.status] || order.status;
-    const next = nextStatus(order.status);
-    const productLabel = order.product_name
-      ? order.product_name
-      : (order.custom_description || 'Commande personnalisée');
+    const action = STATUS_NEXT_ACTION[order.status];
+    const productLabel = order.product_name || 'Commande personnalisée';
 
     return `
-      <div class="card order-card" data-id="${order.id}">
-        <div class="order-col order-customer">
-          <img class="order-thumb" src="${order.image_url || 'https://placehold.co/64x64/f4c6d4/3A2E2E?text=🥄'}" alt="${escapeHtml(order.customer_name)}" />
-          <div>
-            <div class="order-name">${escapeHtml(order.customer_name)}</div>
-            <div class="order-meta">
-              <span class="material-symbols-outlined" style="font-size:16px;">call</span>
-              ${escapeHtml(order.customer_phone)}
+      <tr data-id="${order.id}">
+        <td>
+          <div class="order-client">
+            <div class="order-avatar"><i class="ph-fill ph-user"></i></div>
+            <div class="order-client-info">
+              <div class="order-name">${escapeHtml(order.customer_name)}</div>
+              <div class="order-sub"><i class="ph ph-phone"></i> ${escapeHtml(order.customer_phone)}</div>
             </div>
           </div>
-        </div>
-
-        <div class="order-col" style="border-left:1px solid var(--color-outline-variant);padding-left:24px;">
-          <div style="font-weight:600;margin-bottom:4px;">${escapeHtml(productLabel)}</div>
-          <div class="order-meta">
-            <span class="material-symbols-outlined" style="font-size:16px;">schedule</span>
-            ${formatDate(order.created_at)}
-          </div>
-        </div>
-
-        <div class="order-col order-actions">
-          <span class="chip ${statusClass}">
-            ${order.status === 'nouvelle' ? '<span class="dot"></span>' : ''}
+        </td>
+        <td>
+          <div class="order-product">${escapeHtml(productLabel)}</div>
+          ${order.custom_description ? `<div class="order-sub order-message" title="${escapeHtml(order.custom_description)}"><i class="ph ph-chat-text"></i> ${escapeHtml(order.custom_description)}</div>` : ''}
+        </td>
+        <td>
+          <div class="order-sub"><i class="ph ph-map-pin"></i> ${escapeHtml(order.customer_address)}</div>
+        </td>
+        <td>
+          <div class="order-sub"><i class="ph ph-clock"></i> ${formatDate(order.created_at)}</div>
+        </td>
+        <td>
+          <span class="status-chip ${statusClass}">
+            ${order.status === 'nouvelle' ? '<span class="status-dot"></span>' : `<i class="ph ph-check-circle"></i>`}
             ${statusLabel}
           </span>
-          ${next ? `<button class="icon-btn" title="Passer à « ${STATUS_LABELS[next]} »" onclick="advanceStatus('${order.id}', '${next}')">
-            <span class="material-symbols-outlined">arrow_forward</span>
-          </button>` : ''}
-          <button class="icon-btn" title="Voir détail" onclick="showDetail('${order.id}')">
-            <span class="material-symbols-outlined">visibility</span>
-          </button>
-        </div>
-      </div>
+        </td>
+        <td class="col-actions">
+          <div class="row-actions">
+            ${action ? `
+              <button class="action-btn primary-action" title="${action.label}" onclick="advanceStatus('${order.id}', '${action.next}')">
+                <i class="ph-bold ${action.icon}"></i>
+              </button>
+            ` : `
+              <span class="action-btn done" title="Commande livrée">
+                <i class="ph-fill ph-check-circle"></i>
+              </span>
+            `}
+            <button class="action-btn" title="Voir le détail" onclick="showDetail('${order.id}')">
+              <i class="ph ph-eye"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
     `;
   }).join('');
-}
 
-function escapeHtml(str) {
-  const div = document.createElement('div');
-  div.textContent = str ?? '';
-  return div.innerHTML;
+  ordersList.innerHTML = `
+    <div class="table-scroll">
+      <table class="orders-table">
+        <thead>
+          <tr>
+            <th>Client</th>
+            <th>Produit</th>
+            <th>Adresse</th>
+            <th>Reçue</th>
+            <th>Statut</th>
+            <th class="col-actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  `;
 }
 
 function updateStats() {
   const today = new Date().toDateString();
   const newToday = allOrders.filter(o => o.status === 'nouvelle' && new Date(o.created_at).toDateString() === today).length;
-  statNew.textContent = newToday;
-  statTotal.textContent = allOrders.length;
+
+  const statNewNumber = document.getElementById('statNewNumber');
+  const statTotalNumber = document.getElementById('statTotalNumber');
+  if (statNewNumber) statNewNumber.textContent = newToday;
+  if (statTotalNumber) statTotalNumber.textContent = allOrders.length;
+
+  const counts = { all: allOrders.length, nouvelle: 0, confirmée: 0, prête: 0, livrée: 0 };
+  allOrders.forEach(o => { if (counts[o.status] !== undefined) counts[o.status]++; });
+  Object.keys(counts).forEach(key => {
+    const el = document.getElementById('count' + key.charAt(0).toUpperCase() + key.slice(1));
+    if (el) el.textContent = counts[key];
+  });
+
+  document.dispatchEvent(new CustomEvent('statsUpdated', { detail: { newToday, total: allOrders.length } }));
+  document.dispatchEvent(new CustomEvent('ordersUpdated', { detail: { counts } }));
 }
 
 async function loadOrders() {
-  ordersList.innerHTML = `<div class="loading-state">Chargement des commandes...</div>`;
+  ordersList.innerHTML = `
+    <div class="loading-state">
+      <div class="spinner" aria-hidden="true"></div>
+      <p>Chargement des commandes…</p>
+    </div>
+  `;
   try {
     const res = await fetch('/api/orders');
     if (!res.ok) throw new Error('Erreur de chargement');
@@ -125,7 +165,13 @@ async function loadOrders() {
     updateStats();
     renderOrders();
   } catch (err) {
-    ordersList.innerHTML = `<div class="empty-state">Impossible de charger les commandes. Réessayez.</div>`;
+    ordersList.innerHTML = `
+      <div class="empty-state">
+        <i class="ph ph-warning-circle"></i>
+        <h3>Impossible de charger les commandes</h3>
+        <p>${escapeHtml(err.message)}</p>
+      </div>
+    `;
   }
 }
 
@@ -142,58 +188,48 @@ async function advanceStatus(orderId, newStatus) {
     if (order) order.status = newStatus;
     updateStats();
     renderOrders();
-    showToast(`Commande passée à « ${STATUS_LABELS[newStatus]} »`);
+    if (window.showToast) window.showToast(`Commande passée à « ${STATUS_LABELS[newStatus]} »`, 'success');
   } catch (err) {
-    showToast('Erreur lors de la mise à jour du statut');
+    if (window.showToast) window.showToast('Erreur lors de la mise à jour du statut', 'error');
   }
 }
+window.advanceStatus = advanceStatus;
 
 function showDetail(orderId) {
   const order = allOrders.find(o => o.id === orderId);
   if (!order) return;
   alert(
-    `Client: ${order.customer_name}\n` +
-    `Téléphone: ${order.customer_phone}\n` +
-    `Adresse: ${order.customer_address}\n` +
-    `Produit: ${order.product_name || 'N/A'}\n` +
-    `Message: ${order.custom_description || '—'}\n` +
-    `Statut: ${STATUS_LABELS[order.status] || order.status}`
+    `Client : ${order.customer_name}\n` +
+    `Téléphone : ${order.customer_phone}\n` +
+    `Adresse : ${order.customer_address}\n` +
+    `Produit : ${order.product_name || 'N/A'}\n` +
+    `Message : ${order.custom_description || '—'}\n` +
+    `Statut : ${STATUS_LABELS[order.status] || order.status}`
   );
 }
+window.showDetail = showDetail;
 
 /* =========================
-   FILTERS
+   FILTRES
 ========================= */
-
-if (filterRow) {
-
-  filterRow.addEventListener('click', (e) => {
-
+if (filterBar) {
+  filterBar.addEventListener('click', (e) => {
     const btn = e.target.closest('.filter-pill');
-
     if (!btn) return;
 
-    filterRow
-      .querySelectorAll('.filter-pill')
-      .forEach(p => {
-        p.classList.remove('active');
-      });
-
+    filterBar.querySelectorAll('.filter-pill').forEach(p => {
+      p.classList.remove('active');
+      p.setAttribute('aria-selected', 'false');
+    });
     btn.classList.add('active');
+    btn.setAttribute('aria-selected', 'true');
 
     currentFilter = btn.dataset.status;
-
     renderOrders();
-
   });
-
 }
-
 
 /* =========================
    START
 ========================= */
-
-loadOrders();
-
 loadOrders();
